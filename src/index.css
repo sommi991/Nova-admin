@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-obsidian text-gray-100 antialiased overflow-x-hidden;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-midnight;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cosmic-500/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-cosmic-500/50;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-onyx/80 backdrop-blur-xl border border-eclipse rounded-2xl shadow-2xl;
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-onyx/90 hover:border-cosmic-500/30 transition-all duration-300;
+  }
+
+  .legendary-gradient {
+    @apply bg-gradient-to-r from-cosmic-400 via-electric-400 to-neon-400 animate-gradient-x;
+  }
+
+  .legendary-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cosmic-400 via-electric-400 to-neon-400 animate-gradient-x;
+  }
+
+  .cosmic-glow {
+    @apply relative;
+  }
+
+  .cosmic-glow::before {
+    content: '';
+    @apply absolute -inset-0.5 bg-gradient-to-r from-cosmic-500 to-electric-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-1000;
+  }
+
+  .data-card {
+    @apply glass-card p-6 relative overflow-hidden group;
+  }
+
+  .data-card::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-tr from-cosmic-500/0 via-cosmic-500/0 to-cosmic-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500;
+  }
+
+  .live-badge {
+    @apply flex items-center space-x-1 px-2 py-1 bg-ruby-500/10 text-ruby-400 text-xs rounded-full border border-ruby-500/20;
+  }
+
+  .live-badge::before {
+    content: '';
+    @apply w-1.5 h-1.5 bg-ruby-500 rounded-full animate-pulse mr-1;
+  }
+
+  .metric-value {
+    @apply text-2xl font-bold text-white;
+  }
+
+  .metric-label {
+    @apply text-sm text-gray-400;
+  }
+
+  .metric-change-positive {
+    @apply text-xs text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full;
+  }
+
+  .metric-change-negative {
+    @apply text-xs text-ruby-400 bg-ruby-400/10 px-1.5 py-0.5 rounded-full;
+  }
+}
+
+@layer utilities {
+  .text-shadow-lg {
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+  
+  .text-shadow-xl {
+    text-shadow: 0 0 50px rgba(59, 130, 246, 0.6);
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
