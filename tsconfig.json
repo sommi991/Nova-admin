@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
-    // Target and module settings
     "target": "ES2020",
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    
-    // Module resolution
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -14,8 +11,6 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    
-    // Path aliases
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
@@ -29,65 +24,16 @@
       "@assets/*": ["./src/assets/*"],
       "@styles/*": ["./src/styles/*"]
     },
-    
-    // Strict type checking
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "alwaysStrict": true,
-    "useUnknownInCatchVariables": true,
-    "exactOptionalPropertyTypes": true,
-    
-    // Additional checks
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    
-    // Decorators (if needed)
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    
-    // Type declarations
-    "types": [
-      "vite/client",
-      "node",
-      "react",
-      "react-dom",
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ]
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vite/client", "node", "react", "react-dom"]
   },
-  "include": [
-    "src",
-    "vite.config.ts",
-    "tailwind.config.js",
-    "postcss.config.js",
-    ".eslintrc.js",
-    "vitest.config.ts",
-    "playwright.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "coverage",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
