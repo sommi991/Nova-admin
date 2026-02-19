@@ -1,6 +1,6 @@
-import { import { faker } from '@faker-js/faker'
-import { subDays, subHours, subMonths, addDays } from 'date-fns'
-import {
+import { faker } from '@faker-js/faker';
+import { subDays, subHours, subMonths, addDays } from 'date-fns';
+import type {
   Product,
   Order,
   Customer,
@@ -19,10 +19,10 @@ import {
   CustomerStatus,
   PaymentStatus,
   FulfillmentStatus
-} from '../types'
+} from '../types';
 
 // Initialize faker with seed for consistent data
-faker.seed(123)
+faker.seed(123);
 
 // ============================================================================
 // CONFIGURATION
@@ -39,21 +39,21 @@ export const MOCK_CONFIG = {
   campaignCount: 15,
   ticketCount: 50,
   storeCount: 3
-}
+};
 
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
-const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
-const randomFloat = (min: number, max: number, decimals = 2) => 
-  Number((Math.random() * (max - min) + min).toFixed(decimals))
-const randomBoolean = (probability = 0.5) => Math.random() < probability
-const randomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)]
+const randomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomFloat = (min: number, max: number, decimals = 2): number => 
+  Number((Math.random() * (max - min) + min).toFixed(decimals));
+const randomBoolean = (probability = 0.5): boolean => Math.random() < probability;
+const randomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
 const randomArraySlice = <T>(array: T[], min = 1, max = array.length): T[] => {
-  const count = randomInt(min, max)
-  return faker.helpers.shuffle([...array]).slice(0, count)
-}
+  const count = randomInt(min, max);
+  return faker.helpers.shuffle([...array]).slice(0, count);
+};
 
 // ============================================================================
 // STATIC DATA POOLS
@@ -66,7 +66,7 @@ export const COUNTRIES = [
   { code: 'AU', name: 'Australia', states: ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'] },
   { code: 'DE', name: 'Germany', states: ['BW', 'BY', 'BE', 'BB', 'HB', 'HH', 'HE', 'NI', 'MV', 'NW'] },
   { code: 'FR', name: 'France', states: ['IDF', 'ARA', 'HDF', 'NAQ', 'OCC', 'PDL', 'PAC', 'BRE', 'NOR', 'CVL'] }
-]
+];
 
 export const CATEGORY_NAMES = [
   'Electronics', 'Computers', 'Smartphones', 'Tablets', 'Wearables',
@@ -83,7 +83,7 @@ export const CATEGORY_NAMES = [
   'Baby', 'Kids', 'School Supplies', 'Office Supplies',
   'Automotive', 'Parts', 'Accessories', 'Tools', 'Motorcycle',
   'Groceries', 'Food', 'Beverages', 'Snacks', 'Organic'
-]
+];
 
 export const BRAND_NAMES = [
   'TechPro', 'SoundMaster', 'VisionPlus', 'GameX', 'HomeStyle',
@@ -92,7 +92,7 @@ export const BRAND_NAMES = [
   'GreenGarden', 'ToolTech', 'FitnessFirst', 'OutdoorLife', 'TravelLite',
   'LuxuryLiving', 'BudgetSmart', 'PremiumChoice', 'EcoFriendly', 'SmartHome',
   'DigitalLife', 'ConnectPlus', 'PowerMax', 'SpeedTech', 'QualityFirst'
-]
+];
 
 export const PRODUCT_NAMES = {
   Electronics: [
@@ -122,7 +122,7 @@ export const PRODUCT_NAMES = {
     'Desk Lamp', 'Floor Lamp', 'Ceiling Light', 'String Lights',
     'Plant Pot', 'Garden Tools', 'Hose', 'Sprinkler', 'Bird Feeder'
   ]
-}
+};
 
 export const PRODUCT_DESCRIPTIONS = [
   'High-quality product with premium features and excellent build quality.',
@@ -135,14 +135,14 @@ export const PRODUCT_DESCRIPTIONS = [
   'Eco-friendly and sustainable. Made from recycled materials.',
   'Limited edition with unique design and features.',
   'Best seller in its category. Trusted by millions.'
-]
+];
 
 export const REVIEW_TITLES = [
   'Excellent product!', 'Great value', 'Works perfectly', 'Highly recommend',
   'Good quality', 'Decent for the price', 'Exceeded expectations', 'Love it!',
   'Perfect for my needs', 'Would buy again', 'Five stars', 'Amazing!',
   'Best purchase ever', 'Exactly what I needed', 'Super happy', 'Worth every penny'
-]
+];
 
 export const REVIEW_CONTENTS = [
   'This product is amazing! The quality is top-notch and it works perfectly.',
@@ -155,29 +155,29 @@ export const REVIEW_CONTENTS = [
   'The customer service was excellent when I had a question.',
   'Shipping took a bit longer than expected but product is great.',
   'Best purchase I\'ve made this year. Highly recommended!'
-]
+];
 
 // ============================================================================
 // GENERATORS
 // ============================================================================
 
 export const generateId = (prefix: string): string => {
-  return `${prefix}_${faker.string.alphanumeric(8).toUpperCase()}`
-}
+  return `${prefix}_${faker.string.alphanumeric(8).toUpperCase()}`;
+};
 
 export const generateEmail = (firstName: string, lastName: string): string => {
-  const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'company.com']
-  return `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${randomArrayItem(domains)}`
-}
+  const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'company.com'];
+  return `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${randomArrayItem(domains)}`;
+};
 
 export const generatePhone = (): string => {
-  return `+1 ${faker.string.numeric(3)}-${faker.string.numeric(3)}-${faker.string.numeric(4)}`
-}
+  return `+1 ${faker.string.numeric(3)}-${faker.string.numeric(3)}-${faker.string.numeric(4)}`;
+};
 
 export const generateAddress = (countryCode?: string) => {
   const country = countryCode 
     ? COUNTRIES.find(c => c.code === countryCode) || COUNTRIES[0]
-    : randomArrayItem(COUNTRIES)
+    : randomArrayItem(COUNTRIES);
   
   return {
     firstName: faker.person.firstName(),
@@ -192,16 +192,16 @@ export const generateAddress = (countryCode?: string) => {
     phone: generatePhone(),
     email: generateEmail(faker.person.firstName(), faker.person.lastName()),
     isDefault: randomBoolean(0.3)
-  }
-}
+  };
+};
 
 // ============================================================================
 // STORE GENERATOR
 // ============================================================================
 
 export const generateStore = (): Store => {
-  const id = generateId('store')
-  const name = faker.company.name()
+  const id = generateId('store');
+  const name = faker.company.name();
   
   return {
     id,
@@ -293,17 +293,17 @@ export const generateStore = (): Store => {
     },
     createdAt: subMonths(new Date(), randomInt(1, 24)),
     updatedAt: new Date()
-  }
-}
+  };
+};
 
 // ============================================================================
 // USER GENERATOR
 // ============================================================================
 
 export const generateUser = (storeId?: string): User => {
-  const firstName = faker.person.firstName()
-  const lastName = faker.person.lastName()
-  const id = generateId('user')
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const id = generateId('user');
   
   return {
     id,
@@ -359,16 +359,16 @@ export const generateUser = (storeId?: string): User => {
     updatedAt: new Date(),
     status: randomArrayItem(['active', 'active', 'active', 'inactive']),
     metadata: {}
-  }
-}
+  };
+};
 
 // ============================================================================
 // CATEGORY GENERATOR
 // ============================================================================
 
 export const generateCategory = (parentId?: string): Category => {
-  const id = generateId('cat')
-  const name = randomArrayItem(CATEGORY_NAMES)
+  const id = generateId('cat');
+  const name = randomArrayItem(CATEGORY_NAMES);
   
   return {
     id,
@@ -392,16 +392,16 @@ export const generateCategory = (parentId?: string): Category => {
     },
     createdAt: subMonths(new Date(), randomInt(1, 24)),
     updatedAt: new Date()
-  }
-}
+  };
+};
 
 // ============================================================================
 // BRAND GENERATOR
 // ============================================================================
 
 export const generateBrand = (): Brand => {
-  const id = generateId('brand')
-  const name = randomArrayItem(BRAND_NAMES)
+  const id = generateId('brand');
+  const name = randomArrayItem(BRAND_NAMES);
   
   return {
     id,
@@ -412,8 +412,8 @@ export const generateBrand = (): Brand => {
     website: `https://${faker.helpers.slugify(name)}.com`,
     productCount: randomInt(5, 100),
     isActive: randomBoolean(0.95)
-  }
-}
+  };
+};
 
 // ============================================================================
 // PRODUCT GENERATOR
@@ -424,19 +424,19 @@ export const generateProduct = (
   categories: Category[],
   brands: Brand[]
 ): Product => {
-  const id = generateId('prod')
-  const category = randomArrayItem(categories)
-  const brand = randomArrayItem(brands)
-  const categoryName = category.name
+  const id = generateId('prod');
+  const category = randomArrayItem(categories);
+  const brand = randomArrayItem(brands);
+  const categoryName = category.name;
   const productName = randomArrayItem(
     PRODUCT_NAMES[categoryName as keyof typeof PRODUCT_NAMES] || PRODUCT_NAMES.Electronics
-  )
-  const fullName = `${brand.name} ${productName}`
+  );
+  const fullName = `${brand.name} ${productName}`;
   
-  const price = randomFloat(19.99, 999.99)
-  const cost = price * randomFloat(0.4, 0.7)
-  const quantity = randomInt(0, 100)
-  const sold = randomInt(0, 200)
+  const price = randomFloat(19.99, 999.99);
+  const cost = price * randomFloat(0.4, 0.7);
+  const quantity = randomInt(0, 100);
+  const sold = randomInt(0, 200);
   
   return {
     id,
@@ -529,20 +529,20 @@ export const generateProduct = (
     createdAt: subMonths(new Date(), randomInt(1, 12)),
     updatedAt: new Date(),
     publishedAt: randomBoolean(0.8) ? subDays(new Date(), randomInt(1, 30)) : undefined
-  }
-}
+  };
+};
 
 // ============================================================================
-// CUSTOMER GENERATOR (FIXED VERSION)
+// CUSTOMER GENERATOR
 // ============================================================================
 
 export const generateCustomer = (storeId: string): Customer => {
-  const id = generateId('cust')
-  const firstName = faker.person.firstName()
-  const lastName = faker.person.lastName()
-  const createdAt = subMonths(new Date(), randomInt(1, 24))
-  const totalOrders = randomInt(1, 20)
-  const totalSpent = randomFloat(100, 5000)
+  const id = generateId('cust');
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const createdAt = subMonths(new Date(), randomInt(1, 24));
+  const totalOrders = randomInt(1, 20);
+  const totalSpent = randomFloat(100, 5000);
   
   return {
     id,
@@ -628,8 +628,8 @@ export const generateCustomer = (storeId: string): Customer => {
     status: randomArrayItem<CustomerStatus>(['active', 'active', 'active', 'inactive', 'blocked']),
     verified: randomBoolean(0.9),
     twoFactorEnabled: randomBoolean(0.1)
-  }
-}
+  };
+};
 
 // ============================================================================
 // ORDER GENERATOR
@@ -640,12 +640,12 @@ export const generateOrder = (
   customers: Customer[],
   products: Product[]
 ): Order => {
-  const id = generateId('ord')
-  const customer = randomArrayItem(customers)
-  const itemCount = randomInt(1, 5)
+  const id = generateId('ord');
+  const customer = randomArrayItem(customers);
+  const itemCount = randomInt(1, 5);
   const items = Array.from({ length: itemCount }, () => {
-    const product = randomArrayItem(products)
-    const quantity = randomInt(1, 3)
+    const product = randomArrayItem(products);
+    const quantity = randomInt(1, 3);
     return {
       id: generateId('item'),
       productId: product.id,
@@ -664,20 +664,20 @@ export const generateOrder = (
       dimensions: product.shipping.dimensions,
       isDigital: product.type === 'digital',
       isGift: randomBoolean(0.1)
-    }
-  })
+    };
+  });
 
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0)
-  const shippingTotal = randomFloat(0, 20)
-  const taxTotal = subtotal * 0.1
-  const discountTotal = randomBoolean(0.3) ? randomFloat(5, 20) : 0
-  const total = subtotal + shippingTotal + taxTotal - discountTotal
+  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+  const shippingTotal = randomFloat(0, 20);
+  const taxTotal = subtotal * 0.1;
+  const discountTotal = randomBoolean(0.3) ? randomFloat(5, 20) : 0;
+  const total = subtotal + shippingTotal + taxTotal - discountTotal;
 
-  const statuses: OrderStatus[] = ['pending', 'processing', 'confirmed', 'completed', 'cancelled']
-  const status = randomArrayItem(statuses)
+  const statuses: OrderStatus[] = ['pending', 'processing', 'confirmed', 'completed', 'cancelled'];
+  const status = randomArrayItem(statuses);
   
-  const now = new Date()
-  const createdAt = subDays(now, randomInt(1, 30))
+  const now = new Date();
+  const createdAt = subDays(now, randomInt(1, 30));
   
   return {
     id,
@@ -758,8 +758,8 @@ export const generateOrder = (
     riskLevel: 'low',
     isGift: randomBoolean(0.1),
     giftMessage: randomBoolean(0.1) ? faker.lorem.sentence() : undefined
-  }
-}
+  };
+};
 
 // ============================================================================
 // REVIEW GENERATOR
@@ -770,7 +770,7 @@ export const generateReview = (
   customerId: string,
   orderId?: string
 ): Review => {
-  const rating = randomInt(3, 5)
+  const rating = randomInt(3, 5);
   
   return {
     id: generateId('rev'),
@@ -790,17 +790,17 @@ export const generateReview = (
     status: randomArrayItem(['approved', 'approved', 'approved', 'pending']),
     createdAt: subDays(new Date(), randomInt(1, 60)),
     updatedAt: new Date()
-  }
-}
+  };
+};
 
 // ============================================================================
 // DISCOUNT GENERATOR
 // ============================================================================
 
 export const generateDiscount = (): Discount => {
-  const id = generateId('disc')
-  const type = randomArrayItem(['percentage', 'fixed', 'free_shipping'])
-  const now = new Date()
+  const id = generateId('disc');
+  const type = randomArrayItem(['percentage', 'fixed', 'free_shipping']);
+  const now = new Date();
   
   return {
     id,
@@ -817,16 +817,16 @@ export const generateDiscount = (): Discount => {
     isActive: randomBoolean(0.8),
     createdAt: now,
     createdBy: 'user_123'
-  }
-}
+  };
+};
 
 // ============================================================================
 // CAMPAIGN GENERATOR
 // ============================================================================
 
 export const generateCampaign = (): Campaign => {
-  const id = generateId('camp')
-  const now = new Date()
+  const id = generateId('camp');
+  const now = new Date();
   
   return {
     id,
@@ -881,16 +881,16 @@ export const generateCampaign = (): Campaign => {
     createdAt: subDays(now, randomInt(1, 30)),
     updatedAt: now,
     createdBy: 'user_123'
-  }
-}
+  };
+};
 
 // ============================================================================
 // TICKET GENERATOR
 // ============================================================================
 
 export const generateTicket = (customerId: string): Ticket => {
-  const id = generateId('ticket')
-  const now = new Date()
+  const id = generateId('ticket');
+  const now = new Date();
   
   return {
     id,
@@ -912,26 +912,26 @@ export const generateTicket = (customerId: string): Ticket => {
     metadata: {},
     createdAt: subDays(now, randomInt(1, 7)),
     updatedAt: now
-  }
-}
+  };
+};
 
 // ============================================================================
-// ANALYTICS DATA GENERATOR (FIXED VERSION)
+// ANALYTICS DATA GENERATOR
 // ============================================================================
 
 export const generateAnalyticsData = (
   days: number = 30,
   orders: Order[]
 ): AnalyticsData => {
-  const now = new Date()
-  const start = subDays(now, days)
+  const now = new Date();
+  const start = subDays(now, days);
   
-  // Generate daily data but don't use it (or we can include it in return)
+  // Generate daily data
   const dailyData = Array.from({ length: days }, (_, i) => {
-    const date = subDays(now, days - 1 - i)
+    const date = subDays(now, days - 1 - i);
     const dayOrders = orders.filter(o => 
       o.createdAt.toDateString() === date.toDateString()
-    )
+    );
     
     return {
       date: date.toISOString().split('T')[0],
@@ -939,8 +939,8 @@ export const generateAnalyticsData = (
       orders: dayOrders.length,
       customers: new Set(dayOrders.map(o => o.customer.id)).size,
       aov: dayOrders.length ? dayOrders.reduce((sum, o) => sum + o.total, 0) / dayOrders.length : 0
-    }
-  })
+    };
+  });
 
   return {
     dateRange: {
@@ -1054,40 +1054,40 @@ export const generateAnalyticsData = (
     sort: [],
     limit: 100,
     offset: 0,
-    dailyData // Add this line to include dailyData in the return
-  }
-}
+    dailyData
+  };
+};
 
 // ============================================================================
 // MASTER DATA GENERATOR
 // ============================================================================
 
 export const generateMockData = () => {
-  console.log('🚀 Generating mock data...')
+  console.log('🚀 Generating mock data...');
   
   // Generate stores
-  const stores = Array.from({ length: MOCK_CONFIG.storeCount }, generateStore)
-  const storeIds = stores.map(s => s.id)
+  const stores = Array.from({ length: MOCK_CONFIG.storeCount }, generateStore);
+  const storeIds = stores.map(s => s.id);
   
   // Generate users
   const users = storeIds.flatMap(storeId => 
     Array.from({ length: 3 }, () => generateUser(storeId))
-  )
+  );
   
   // Generate categories (with hierarchy)
   const topLevelCategories = Array.from(
     { length: MOCK_CONFIG.categoryCount / 2 },
     () => generateCategory()
-  )
+  );
   
   const subCategories = topLevelCategories.flatMap(parent => 
     Array.from({ length: 2 }, () => generateCategory(parent.id))
-  )
+  );
   
-  const categories = [...topLevelCategories, ...subCategories]
+  const categories = [...topLevelCategories, ...subCategories];
   
   // Generate brands
-  const brands = Array.from({ length: MOCK_CONFIG.brandCount }, generateBrand)
+  const brands = Array.from({ length: MOCK_CONFIG.brandCount }, generateBrand);
   
   // Generate products
   const products = storeIds.flatMap(storeId => 
@@ -1095,7 +1095,7 @@ export const generateMockData = () => {
       { length: MOCK_CONFIG.productCount / storeIds.length },
       () => generateProduct(storeId, categories, brands)
     )
-  )
+  );
   
   // Generate customers
   const customers = storeIds.flatMap(storeId => 
@@ -1103,7 +1103,7 @@ export const generateMockData = () => {
       { length: MOCK_CONFIG.customerCount / storeIds.length },
       () => generateCustomer(storeId)
     )
-  )
+  );
   
   // Generate orders
   const orders = storeIds.flatMap(storeId => 
@@ -1111,7 +1111,7 @@ export const generateMockData = () => {
       { length: MOCK_CONFIG.orderCount / storeIds.length },
       () => generateOrder(storeId, customers, products)
     )
-  ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   
   // Generate reviews
   const reviews = products.flatMap(product => 
@@ -1123,13 +1123,13 @@ export const generateMockData = () => {
         randomArrayItem(orders.filter(o => o.items.some(i => i.productId === product.id)))?.id
       )
     )
-  )
+  );
   
   // Generate discounts
-  const discounts = Array.from({ length: MOCK_CONFIG.discountCount }, generateDiscount)
+  const discounts = Array.from({ length: MOCK_CONFIG.discountCount }, generateDiscount);
   
   // Generate campaigns
-  const campaigns = Array.from({ length: MOCK_CONFIG.campaignCount }, generateCampaign)
+  const campaigns = Array.from({ length: MOCK_CONFIG.campaignCount }, generateCampaign);
   
   // Generate tickets
   const tickets = customers.flatMap(customer => 
@@ -1137,17 +1137,17 @@ export const generateMockData = () => {
       { length: randomInt(0, 2) },
       () => generateTicket(customer.id)
     )
-  )
+  );
   
   // Generate analytics
-  const analytics = generateAnalyticsData(30, orders)
+  const analytics = generateAnalyticsData(30, orders);
   
-  console.log('✅ Mock data generated successfully!')
-  console.log(`📊 ${stores.length} stores`)
-  console.log(`📦 ${products.length} products`)
-  console.log(`👥 ${customers.length} customers`)
-  console.log(`🛍️ ${orders.length} orders`)
-  console.log(`⭐ ${reviews.length} reviews`)
+  console.log('✅ Mock data generated successfully!');
+  console.log(`📊 ${stores.length} stores`);
+  console.log(`📦 ${products.length} products`);
+  console.log(`👥 ${customers.length} customers`);
+  console.log(`🛍️ ${orders.length} orders`);
+  console.log(`⭐ ${reviews.length} reviews`);
   
   return {
     stores,
@@ -1162,11 +1162,11 @@ export const generateMockData = () => {
     campaigns,
     tickets,
     analytics
-  }
-}
+  };
+};
 
 // ============================================================================
 // EXPORT DEFAULT DATA
 // ============================================================================
 
-export default generateMockData()
+export default generateMockData;
