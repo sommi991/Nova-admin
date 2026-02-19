@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker'
+import { import { faker } from '@faker-js/faker'
 import { subDays, subHours, subMonths, addDays } from 'date-fns'
 import {
   Product,
@@ -533,7 +533,7 @@ export const generateProduct = (
 }
 
 // ============================================================================
-// CUSTOMER GENERATOR
+// CUSTOMER GENERATOR (FIXED VERSION)
 // ============================================================================
 
 export const generateCustomer = (storeId: string): Customer => {
@@ -585,7 +585,13 @@ export const generateCustomer = (storeId: string): Customer => {
       newsletter: randomBoolean(0.7),
       marketingEmails: randomBoolean(0.5),
       smsNotifications: randomBoolean(0.3),
-      pushNotifications: randomBoolean(0.4)
+      pushNotifications: randomBoolean(0.4),
+      priceAlerts: randomBoolean(0.6),
+      stockAlerts: randomBoolean(0.8),
+      reviewReminders: randomBoolean(0.5),
+      birthdayReminders: randomBoolean(0.4),
+      preferredCategories: [],
+      preferredBrands: []
     },
     communications: {
       email: randomBoolean(0.9),
@@ -910,7 +916,7 @@ export const generateTicket = (customerId: string): Ticket => {
 }
 
 // ============================================================================
-// ANALYTICS DATA GENERATOR
+// ANALYTICS DATA GENERATOR (FIXED VERSION)
 // ============================================================================
 
 export const generateAnalyticsData = (
@@ -920,6 +926,7 @@ export const generateAnalyticsData = (
   const now = new Date()
   const start = subDays(now, days)
   
+  // Generate daily data but don't use it (or we can include it in return)
   const dailyData = Array.from({ length: days }, (_, i) => {
     const date = subDays(now, days - 1 - i)
     const dayOrders = orders.filter(o => 
@@ -1046,7 +1053,8 @@ export const generateAnalyticsData = (
     filters: [],
     sort: [],
     limit: 100,
-    offset: 0
+    offset: 0,
+    dailyData // Add this line to include dailyData in the return
   }
 }
 
