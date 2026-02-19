@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"]
+  },
+  "include": [
+    "vite.config.ts",
+    "tailwind.config.js",
+    "postcss.config.js",
+    ".eslintrc.js",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
+}
