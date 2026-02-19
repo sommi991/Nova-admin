@@ -632,7 +632,7 @@ export const generateCustomer = (storeId: string): Customer => {
 };
 
 // ============================================================================
-// ORDER GENERATOR
+// ORDER GENERATOR (FIXED VERSION)
 // ============================================================================
 
 export const generateOrder = (
@@ -718,7 +718,7 @@ export const generateOrder = (
     createdAt,
     updatedAt: status === 'completed' ? addDays(createdAt, randomInt(1, 5)) : now,
     processedAt: status !== 'pending' ? addDays(createdAt, randomInt(0, 2)) : undefined,
-    fulfilledAt: ['shipped', 'delivered'].includes(status) ? addDays(createdAt, randomInt(2, 5)) : undefined,
+    fulfilledAt: status === 'shipped' || status === 'delivered' ? addDays(createdAt, randomInt(2, 5)) : undefined,
     cancelledAt: status === 'cancelled' ? addDays(createdAt, randomInt(1, 3)) : undefined,
     notes: randomBoolean(0.3) ? [{
       id: generateId('note'),
@@ -794,12 +794,12 @@ export const generateReview = (
 };
 
 // ============================================================================
-// DISCOUNT GENERATOR
+// DISCOUNT GENERATOR (FIXED VERSION)
 // ============================================================================
 
 export const generateDiscount = (): Discount => {
   const id = generateId('disc');
-  const type = randomArrayItem(['percentage', 'fixed', 'free_shipping']);
+  const type = randomArrayItem(['percentage', 'fixed', 'free_shipping']) as 'percentage' | 'fixed' | 'free_shipping';
   const now = new Date();
   
   return {
@@ -916,7 +916,7 @@ export const generateTicket = (customerId: string): Ticket => {
 };
 
 // ============================================================================
-// ANALYTICS DATA GENERATOR
+// ANALYTICS DATA GENERATOR (FIXED VERSION)
 // ============================================================================
 
 export const generateAnalyticsData = (
@@ -926,7 +926,7 @@ export const generateAnalyticsData = (
   const now = new Date();
   const start = subDays(now, days);
   
-  // Generate daily data
+  // Generate daily data (used for internal calculations)
   const dailyData = Array.from({ length: days }, (_, i) => {
     const date = subDays(now, days - 1 - i);
     const dayOrders = orders.filter(o => 
@@ -942,6 +942,12 @@ export const generateAnalyticsData = (
     };
   });
 
+  // Calculate totals from dailyData
+  const totalRevenue = dailyData.reduce((sum, d) => sum + d.revenue, 0);
+  const totalOrders = dailyData.reduce((sum, d) => sum + d.orders, 0);
+  const totalCustomers = dailyData.reduce((sum, d) => sum + d.customers, 0);
+  const totalProducts = orders.reduce((sum, o) => sum + o.items.length, 0);
+
   return {
     dateRange: {
       start,
@@ -950,32 +956,32 @@ export const generateAnalyticsData = (
     },
     metrics: {
       revenue: {
-        value: orders.reduce((sum, o) => sum + o.total, 0),
-        previousValue: 0,
+        value: totalRevenue,
+        previousValue: totalRevenue * 0.8,
         change: 23.5,
         trend: 'up',
         format: 'currency',
         label: 'Total Revenue'
       },
       orders: {
-        value: orders.length,
-        previousValue: 0,
+        value: totalOrders,
+        previousValue: totalOrders * 0.85,
         change: 12.3,
         trend: 'up',
         format: 'number',
         label: 'Total Orders'
       },
       customers: {
-        value: new Set(orders.map(o => o.customer.id)).size,
-        previousValue: 0,
+        value: totalCustomers,
+        previousValue: totalCustomers * 0.82,
         change: 18.2,
         trend: 'up',
         format: 'number',
         label: 'Customers'
       },
       products: {
-        value: orders.reduce((sum, o) => sum + o.items.length, 0),
-        previousValue: 0,
+        value: totalProducts,
+        previousValue: totalProducts * 0.9,
         change: 8.7,
         trend: 'up',
         format: 'number',
@@ -990,7 +996,7 @@ export const generateAnalyticsData = (
         label: 'Conversion Rate'
       },
       aov: {
-        value: orders.length ? orders.reduce((sum, o) => sum + o.total, 0) / orders.length : 0,
+        value: totalOrders ? totalRevenue / totalOrders : 0,
         previousValue: 0,
         change: 5.6,
         trend: 'up',
@@ -1015,7 +1021,7 @@ export const generateAnalyticsData = (
       },
       traffic: {
         value: randomInt(10000, 50000),
-        previousValue: 0,
+        previousValue: randomInt(8000, 40000),
         change: 15.4,
         trend: 'up',
         format: 'number',
@@ -1023,7 +1029,7 @@ export const generateAnalyticsData = (
       },
       sessions: {
         value: randomInt(8000, 40000),
-        previousValue: 0,
+        previousValue: randomInt(6000, 35000),
         change: 12.8,
         trend: 'up',
         format: 'number',
@@ -1031,7 +1037,7 @@ export const generateAnalyticsData = (
       },
       pageviews: {
         value: randomInt(20000, 100000),
-        previousValue: 0,
+        previousValue: randomInt(15000, 90000),
         change: 22.1,
         trend: 'up',
         format: 'number',
@@ -1039,7 +1045,7 @@ export const generateAnalyticsData = (
       },
       bounceRate: {
         value: randomFloat(35, 55),
-        previousValue: 0,
+        previousValue: randomFloat(38, 58),
         change: -2.3,
         trend: 'down',
         format: 'percentage',
@@ -1053,8 +1059,7 @@ export const generateAnalyticsData = (
     filters: [],
     sort: [],
     limit: 100,
-    offset: 0,
-    dailyData
+    offset: 0
   };
 };
 
