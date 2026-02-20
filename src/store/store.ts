@@ -45,7 +45,7 @@ const initialUserState: UserState = {
 
 export const useUserStore = create<UserState & UserActions>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialUserState,
       
       login: async (email: string, password: string) => {
