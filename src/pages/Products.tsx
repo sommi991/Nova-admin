@@ -8,8 +8,6 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
-import { useSwipeable } from 'react-swipeable'
-import { useLongPress } from 'use-long-press'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { TouchBackend } from 'react-dnd-touch-backend'
@@ -131,6 +129,11 @@ interface Review {
 }
 
 // ============= DRAGGABLE PRODUCT CARD =============
+interface DragItem {
+  id: string
+  index: number
+}
+
 const DraggableProductCard: React.FC<{
   product: Product
   index: number
@@ -141,14 +144,18 @@ const DraggableProductCard: React.FC<{
   onDuplicate: (product: Product) => void
 }> = ({ product, index, moveCard, onSelect, onEdit, onDelete, onDuplicate }) => {
   const ref = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
 
-  const [{ handlerId }, drop] = useDrop({
-    accept: 'product',
+  const [{ isDragging }, drag] = useDrag({
+    type: 'product',
+    item: { id: product.id, index },
     collect: (monitor) => ({
-      handlerId: monitor.getHandlerId()
-    }),
-    hover(item: { id: string; index: number }, monitor) {
+      isDragging: monitor.isDragging()
+    })
+  })
+
+  const [, drop] = useDrop<DragItem, void>({
+    accept: 'product',
+    hover: (item, monitor) => {
       if (!ref.current) return
       const dragIndex = item.index
       const hoverIndex = index
@@ -157,7 +164,8 @@ const DraggableProductCard: React.FC<{
       const hoverBoundingRect = ref.current.getBoundingClientRect()
       const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
       const clientOffset = monitor.getClientOffset()
-      const hoverClientY = clientOffset!.y - hoverBoundingRect.top
+      if (!clientOffset) return
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top
 
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
@@ -167,28 +175,7 @@ const DraggableProductCard: React.FC<{
     }
   })
 
-  const [{ isDragging: dragPreview }, drag] = useDrag({
-    type: 'product',
-    item: () => ({ id: product.id, index }),
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    }),
-    end: () => setIsDragging(false)
-  })
-
   drag(drop(ref))
-
-  const handlers = useSwipeable({
-    onSwipedRight: () => {
-      toast.success(`Duplicating ${product.name}`)
-      onDuplicate(product)
-    },
-    trackMouse: true
-  })
-
-  const longPress = useLongPress(() => {
-    toast.success(`Quick actions for ${product.name}`)
-  })
 
   const profitColor = product.profit > 0 ? 'text-success-green' : 'text-error-red'
   const stockStatus = product.available < product.lowStockThreshold ? 'error' : 
@@ -197,16 +184,9 @@ const DraggableProductCard: React.FC<{
   return (
     <motion.div
       ref={ref}
-      {...handlers}
-      {...longPress}
-      data-handler-id={handlerId}
       layout
       initial={{ opacity: 0, y: 20 }}
-      animate={{
-        opacity: isDragging ? 0.5 : 1,
-        y: 0,
-        scale: isDragging ? 1.02 : 1
-      }}
+      animate={{ opacity: isDragging ? 0.5 : 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       whileHover={{ scale: 1.02, y: -5 }}
@@ -411,7 +391,7 @@ const BulkEditor: React.FC<{
         <div className="space-y-4">
           <h4 className="text-white font-medium">Update Prices</h4>
           <div className="flex items-center space-x-2">
-            <select value={priceChangeType} onChange={(e) => setPriceChangeType(e.target.value as any)}
+            <select value={priceChangeType} onChange={(e) => setPriceChangeType(e.target.value as 'fixed' | 'percentage')}
               className="bg-dark-hover border border-dark-border rounded-lg px-4 py-2 text-white">
               <option value="fixed">Fixed amount</option>
               <option value="percentage">Percentage</option>
@@ -465,7 +445,6 @@ const ProductDetailsModal: React.FC<{
   onSave: (updated: Product) => void
 }> = ({ product, onClose, onSave }) => {
   const [editedProduct, setEditedProduct] = useState(product)
-  const [activeTab] = useState<'details' | 'variants' | 'inventory' | 'seo' | 'reviews'>('details')
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
