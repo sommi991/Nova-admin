@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Settings as SettingsIcon, User, Bell, Shield, CreditCard,
+  Settings as SettingsIcon, User, Bell, Shield,
   Palette, Download, Upload, RefreshCw, Save,
-  Trash2, AlertCircle, X, ShoppingBag, Database,
-  Globe, Mail, Lock, Sun, Moon
+  AlertCircle, ShoppingBag, Database
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useUserStore, useUIStore } from '../store/store';
