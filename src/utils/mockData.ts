@@ -632,7 +632,7 @@ export const generateCustomer = (storeId: string): Customer => {
 };
 
 // ============================================================================
-// ORDER GENERATOR (FIXED VERSION)
+// ORDER GENERATOR (FIXED VERSION - USING CORRECT STATUS TYPES)
 // ============================================================================
 
 export const generateOrder = (
@@ -673,8 +673,13 @@ export const generateOrder = (
   const discountTotal = randomBoolean(0.3) ? randomFloat(5, 20) : 0;
   const total = subtotal + shippingTotal + taxTotal - discountTotal;
 
+  // Order status - valid values: 'pending', 'processing', 'confirmed', 'completed', 'cancelled'
   const statuses: OrderStatus[] = ['pending', 'processing', 'confirmed', 'completed', 'cancelled'];
   const status = randomArrayItem(statuses);
+  
+  // Fulfillment status - valid values: 'unfulfilled', 'fulfilled', 'shipped', 'delivered'
+  const fulfillmentStatuses: FulfillmentStatus[] = ['unfulfilled', 'fulfilled', 'shipped', 'delivered'];
+  const fulfillmentStatus = randomArrayItem(fulfillmentStatuses);
   
   const now = new Date();
   const createdAt = subDays(now, randomInt(1, 30));
@@ -700,7 +705,7 @@ export const generateOrder = (
     currency: 'USD',
     status,
     paymentStatus: randomArrayItem<PaymentStatus>(['paid', 'paid', 'paid', 'pending', 'failed']),
-    fulfillmentStatus: randomArrayItem<FulfillmentStatus>(['unfulfilled', 'fulfilled', 'shipped', 'delivered']),
+    fulfillmentStatus,
     paymentMethod: randomArrayItem(['credit_card', 'paypal', 'bank_transfer']),
     shippingMethod: {
       id: generateId('ship'),
@@ -718,7 +723,8 @@ export const generateOrder = (
     createdAt,
     updatedAt: status === 'completed' ? addDays(createdAt, randomInt(1, 5)) : now,
     processedAt: status !== 'pending' ? addDays(createdAt, randomInt(0, 2)) : undefined,
-    fulfilledAt: status === 'shipped' || status === 'delivered' ? addDays(createdAt, randomInt(2, 5)) : undefined,
+    // Use fulfillmentStatus instead of status for these fields
+    fulfilledAt: fulfillmentStatus !== 'unfulfilled' ? addDays(createdAt, randomInt(2, 5)) : undefined,
     cancelledAt: status === 'cancelled' ? addDays(createdAt, randomInt(1, 3)) : undefined,
     notes: randomBoolean(0.3) ? [{
       id: generateId('note'),
@@ -728,14 +734,15 @@ export const generateOrder = (
       createdAt: addDays(createdAt, randomInt(0, 2))
     }] : [],
     tags: randomBoolean(0.2) ? ['gift', 'priority'] : [],
-    tracking: status === 'shipped' || status === 'delivered' ? [{
+    // Use fulfillmentStatus for tracking as well
+    tracking: fulfillmentStatus === 'shipped' || fulfillmentStatus === 'delivered' ? [{
       id: generateId('track'),
       carrier: randomArrayItem(['UPS', 'FedEx', 'USPS']),
       trackingNumber: faker.string.alphanumeric(12).toUpperCase(),
       trackingUrl: 'https://example.com/track',
       status: randomArrayItem(['in_transit', 'out_for_delivery', 'delivered']),
       estimatedDelivery: addDays(createdAt, 5),
-      deliveredAt: status === 'delivered' ? addDays(createdAt, randomInt(3, 7)) : undefined,
+      deliveredAt: fulfillmentStatus === 'delivered' ? addDays(createdAt, randomInt(3, 7)) : undefined,
       events: []
     }] : [],
     metadata: {
@@ -794,7 +801,7 @@ export const generateReview = (
 };
 
 // ============================================================================
-// DISCOUNT GENERATOR (FIXED VERSION)
+// DISCOUNT GENERATOR
 // ============================================================================
 
 export const generateDiscount = (): Discount => {
@@ -916,7 +923,7 @@ export const generateTicket = (customerId: string): Ticket => {
 };
 
 // ============================================================================
-// ANALYTICS DATA GENERATOR (FIXED VERSION)
+// ANALYTICS DATA GENERATOR
 // ============================================================================
 
 export const generateAnalyticsData = (
