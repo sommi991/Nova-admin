@@ -1,28 +1,28 @@
-import { format, formatDistance, formatRelative, formatDuration, intervalToDuration } from 'date-fns'
-import { enUS, es, fr, de, it, pt, ja, zh, ar, ru } from 'date-fns/locale'
+import { format, formatDistance, formatRelative, formatDuration, intervalToDuration } from 'date-fns';
+import { enUS, es, fr, de, it, pt, ja, zh, ar, ru } from 'date-fns/locale';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type Locale = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ja' | 'zh' | 'ar' | 'ru'
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'AUD' | 'CHF' | 'CNY' | 'INR' | 'BRL'
-export type Unit = 'metric' | 'imperial'
-export type DateFormat = 'short' | 'medium' | 'long' | 'full' | 'relative' | 'iso'
-export type NumberFormat = 'decimal' | 'percent' | 'scientific' | 'engineering'
+export type Locale = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ja' | 'zh' | 'ar' | 'ru';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'AUD' | 'CHF' | 'CNY' | 'INR' | 'BRL';
+export type Unit = 'metric' | 'imperial';
+export type DateFormat = 'short' | 'medium' | 'long' | 'full' | 'relative' | 'iso';
+export type NumberFormat = 'decimal' | 'percent' | 'scientific' | 'engineering';
 
 export interface FormatOptions {
-  locale?: Locale
-  currency?: Currency
-  unit?: Unit
-  precision?: number
-  compact?: boolean
-  signDisplay?: 'auto' | 'always' | 'exceptZero' | 'never'
-  notation?: 'standard' | 'scientific' | 'engineering' | 'compact'
-  minimumFractionDigits?: number
-  maximumFractionDigits?: number
-  minimumIntegerDigits?: number
-  useGrouping?: boolean
+  locale?: Locale;
+  currency?: Currency;
+  unit?: Unit;
+  precision?: number;
+  compact?: boolean;
+  signDisplay?: 'auto' | 'always' | 'exceptZero' | 'never';
+  notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+  minimumIntegerDigits?: number;
+  useGrouping?: boolean;
 }
 
 // ============================================================================
@@ -40,7 +40,7 @@ const LOCALE_MAP: Record<Locale, Locale> = {
   zh: 'zh',
   ar: 'ar',
   ru: 'ru'
-}
+};
 
 const DATE_FNS_LOCALE: Record<Locale, any> = {
   en: enUS,
@@ -53,7 +53,7 @@ const DATE_FNS_LOCALE: Record<Locale, any> = {
   zh: zh,
   ar: ar,
   ru: ru
-}
+};
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
   USD: '$',
@@ -66,7 +66,7 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
   CNY: '¥',
   INR: '₹',
   BRL: 'R$'
-}
+};
 
 const CURRENCY_NAMES: Record<Currency, string> = {
   USD: 'US Dollar',
@@ -79,23 +79,23 @@ const CURRENCY_NAMES: Record<Currency, string> = {
   CNY: 'Chinese Yuan',
   INR: 'Indian Rupee',
   BRL: 'Brazilian Real'
-}
+};
 
 // ============================================================================
 // CURRENCY FORMATTER
 // ============================================================================
 
 export class CurrencyFormatter {
-  private static instances: Map<string, Intl.NumberFormat> = new Map()
+  private static instances: Map<string, Intl.NumberFormat> = new Map();
 
   static format(
     amount: number,
     currency: Currency = 'USD',
     options: FormatOptions = {}
   ): string {
-    const { locale = 'en', compact = false, signDisplay = 'auto' } = options
+    const { locale = 'en', compact = false, signDisplay = 'auto' } = options;
     
-    const cacheKey = `${locale}-${currency}-${compact}-${signDisplay}`
+    const cacheKey = `${locale}-${currency}-${compact}-${signDisplay}`;
     
     if (!this.instances.has(cacheKey)) {
       this.instances.set(
@@ -108,20 +108,20 @@ export class CurrencyFormatter {
           minimumFractionDigits: options.minimumFractionDigits ?? (compact ? 0 : 2),
           maximumFractionDigits: options.maximumFractionDigits ?? (compact ? 1 : 2)
         })
-      )
+      );
     }
 
-    return this.instances.get(cacheKey)!.format(amount)
+    return this.instances.get(cacheKey)!.format(amount);
   }
 
   static formatWithSymbol(amount: number, currency: Currency): string {
-    const symbol = CURRENCY_SYMBOLS[currency]
-    return `${symbol}${amount.toFixed(2)}`
+    const symbol = CURRENCY_SYMBOLS[currency];
+    return `${symbol}${amount.toFixed(2)}`;
   }
 
   static formatWithName(amount: number, currency: Currency): string {
-    const name = CURRENCY_NAMES[currency]
-    return `${amount.toFixed(2)} ${name}`
+    const name = CURRENCY_NAMES[currency];
+    return `${amount.toFixed(2)} ${name}`;
   }
 
   static formatRange(
@@ -130,7 +130,7 @@ export class CurrencyFormatter {
     currency: Currency = 'USD',
     options: FormatOptions = {}
   ): string {
-    return `${this.format(min, currency, options)} - ${this.format(max, currency, options)}`
+    return `${this.format(min, currency, options)} - ${this.format(max, currency, options)}`;
   }
 
   static formatDelta(
@@ -139,15 +139,15 @@ export class CurrencyFormatter {
     currency: Currency = 'USD',
     options: FormatOptions = {}
   ): string {
-    const delta = current - previous
+    const delta = current - previous;
     const formatted = this.format(Math.abs(delta), currency, {
       ...options,
       signDisplay: 'never'
-    })
+    });
     
-    if (delta > 0) return `+${formatted}`
-    if (delta < 0) return `-${formatted}`
-    return formatted
+    if (delta > 0) return `+${formatted}`;
+    if (delta < 0) return `-${formatted}`;
+    return formatted;
   }
 
   static formatChange(
@@ -155,14 +155,14 @@ export class CurrencyFormatter {
     previous: number,
     options: FormatOptions = {}
   ): { value: string; percentage: string; direction: 'up' | 'down' | 'stable' } {
-    const delta = current - previous
-    const percentage = previous !== 0 ? (delta / previous) * 100 : 0
+    const delta = current - previous;
+    const percentage = previous !== 0 ? (delta / previous) * 100 : 0;
     
     return {
       value: this.formatDelta(current, previous, 'USD', options),
       percentage: NumberFormatter.formatPercent(percentage / 100, options),
       direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable'
-    }
+    };
   }
 }
 
@@ -171,7 +171,7 @@ export class CurrencyFormatter {
 // ============================================================================
 
 export class NumberFormatter {
-  private static instances: Map<string, Intl.NumberFormat> = new Map()
+  private static instances: Map<string, Intl.NumberFormat> = new Map();
 
   static format(
     value: number,
@@ -187,9 +187,9 @@ export class NumberFormatter {
       maximumFractionDigits,
       minimumIntegerDigits,
       useGrouping = true
-    } = options
+    } = options;
 
-    const cacheKey = `${locale}-${precision}-${compact}-${notation}-${signDisplay}`
+    const cacheKey = `${locale}-${precision}-${compact}-${notation}-${signDisplay}`;
     
     if (!this.instances.has(cacheKey)) {
       this.instances.set(
@@ -203,14 +203,14 @@ export class NumberFormatter {
           minimumIntegerDigits,
           useGrouping
         })
-      )
+      );
     }
 
-    return this.instances.get(cacheKey)!.format(value)
+    return this.instances.get(cacheKey)!.format(value);
   }
 
   static formatCompact(value: number, precision: number = 1): string {
-    return this.format(value, { compact: true, precision })
+    return this.format(value, { compact: true, precision });
   }
 
   static formatPercent(value: number, options: FormatOptions = {}): string {
@@ -219,77 +219,77 @@ export class NumberFormatter {
       minimumFractionDigits: options.minimumFractionDigits ?? 1,
       maximumFractionDigits: options.maximumFractionDigits ?? 2,
       signDisplay: options.signDisplay
-    }).format(value)
+    }).format(value);
   }
 
   static formatOrdinal(value: number, locale: Locale = 'en'): string {
-    const pr = new Intl.PluralRules(locale, { type: 'ordinal' })
-    const suffixes: Record<string, string> = {
+    const pr = new Intl.PluralRules(locale, { type: 'ordinal' });
+    const suffixes: Record<string, Record<string, string>> = {
       en: { one: 'st', two: 'nd', few: 'rd', other: 'th' },
       es: { one: 'º', other: 'º' },
       fr: { one: 'er', other: 'e' },
       de: { one: '.', other: '.' },
       it: { one: 'º', other: 'º' },
       pt: { one: 'º', other: 'º' }
-    }
+    };
     
-    const rule = pr.select(value)
-    return `${value}${suffixes[locale]?.[rule] || suffixes.en[rule]}`
+    const rule = pr.select(value);
+    return `${value}${suffixes[locale]?.[rule] || suffixes.en[rule]}`;
   }
 
   static formatBytes(bytes: number, decimals: number = 2): string {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) return '0 Bytes';
 
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 
   static formatDuration(seconds: number): string {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
-    const parts = []
-    if (hours > 0) parts.push(`${hours}h`)
-    if (minutes > 0) parts.push(`${minutes}m`)
-    if (secs > 0 || parts.length === 0) parts.push(`${secs}s`)
+    const parts = [];
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
 
-    return parts.join(' ')
+    return parts.join(' ');
   }
 
   static formatDistance(meters: number, unit: Unit = 'metric'): string {
     if (unit === 'metric') {
-      if (meters < 1000) return `${Math.round(meters)} m`
-      return `${(meters / 1000).toFixed(2)} km`
+      if (meters < 1000) return `${Math.round(meters)} m`;
+      return `${(meters / 1000).toFixed(2)} km`;
     } else {
-      const feet = meters * 3.28084
-      if (feet < 5280) return `${Math.round(feet)} ft`
-      return `${(feet / 5280).toFixed(2)} mi`
+      const feet = meters * 3.28084;
+      if (feet < 5280) return `${Math.round(feet)} ft`;
+      return `${(feet / 5280).toFixed(2)} mi`;
     }
   }
 
   static formatWeight(grams: number, unit: Unit = 'metric'): string {
     if (unit === 'metric') {
-      if (grams < 1000) return `${grams} g`
-      return `${(grams / 1000).toFixed(2)} kg`
+      if (grams < 1000) return `${grams} g`;
+      return `${(grams / 1000).toFixed(2)} kg`;
     } else {
-      const ounces = grams * 0.035274
-      if (ounces < 16) return `${ounces.toFixed(1)} oz`
-      return `${(ounces / 16).toFixed(2)} lb`
+      const ounces = grams * 0.035274;
+      if (ounces < 16) return `${ounces.toFixed(1)} oz`;
+      return `${(ounces / 16).toFixed(2)} lb`;
     }
   }
 
   static formatTemperature(celsius: number, unit: Unit = 'metric'): string {
     if (unit === 'metric') {
-      return `${Math.round(celsius)}°C`
+      return `${Math.round(celsius)}°C`;
     } else {
-      const fahrenheit = (celsius * 9/5) + 32
-      return `${Math.round(fahrenheit)}°F`
+      const fahrenheit = (celsius * 9/5) + 32;
+      return `${Math.round(fahrenheit)}°F`;
     }
   }
 }
@@ -299,28 +299,28 @@ export class NumberFormatter {
 // ============================================================================
 
 export class DateFormatter {
-  static format(
+  static formatDate(
     date: Date | string | number,
     formatStr: string = 'PPP',
     locale: Locale = 'en'
   ): string {
     const dateObj = typeof date === 'string' || typeof date === 'number' 
       ? new Date(date) 
-      : date
+      : date;
     
-    return format(dateObj, formatStr, { locale: DATE_FNS_LOCALE[locale] })
+    return format(dateObj, formatStr, { locale: DATE_FNS_LOCALE[locale] });
   }
 
   static formatShort(date: Date | string | number, locale: Locale = 'en'): string {
-    return this.format(date, 'PP', locale)
+    return this.formatDate(date, 'PP', locale);
   }
 
   static formatMedium(date: Date | string | number, locale: Locale = 'en'): string {
-    return this.format(date, 'PPP', locale)
+    return this.formatDate(date, 'PPP', locale);
   }
 
   static formatLong(date: Date | string | number, locale: Locale = 'en'): string {
-    return this.format(date, 'PPPP', locale)
+    return this.formatDate(date, 'PPPP', locale);
   }
 
   static formatRelative(
@@ -328,25 +328,10 @@ export class DateFormatter {
     baseDate: Date | string | number = new Date(),
     locale: Locale = 'en'
   ): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const baseObj = typeof baseDate === 'string' || typeof baseDate === 'number' ? new Date(baseDate) : baseDate
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const baseObj = typeof baseDate === 'string' || typeof baseDate === 'number' ? new Date(baseDate) : baseDate;
     
-    return formatRelative(dateObj, baseObj, { locale: DATE_FNS_LOCALE[locale] })
-  }
-
-  static formatDistance(
-    date: Date | string | number,
-    baseDate: Date | string | number = new Date(),
-    options: { addSuffix?: boolean; includeSeconds?: boolean } = {},
-    locale: Locale = 'en'
-  ): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const baseObj = typeof baseDate === 'string' || typeof baseDate === 'number' ? new Date(baseDate) : baseDate
-    
-    return formatDistance(dateObj, baseObj, {
-      ...options,
-      locale: DATE_FNS_LOCALE[locale]
-    })
+    return formatRelative(dateObj, baseObj, { locale: DATE_FNS_LOCALE[locale] });
   }
 
   static formatDistanceToNow(
@@ -354,28 +339,32 @@ export class DateFormatter {
     options: { addSuffix?: boolean; includeSeconds?: boolean } = {},
     locale: Locale = 'en'
   ): string {
-    return this.formatDistance(date, new Date(), options, locale)
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    return formatDistance(dateObj, new Date(), {
+      ...options,
+      locale: DATE_FNS_LOCALE[locale]
+    });
   }
 
-  static formatDuration(
+  static formatDurationBetween(
     start: Date | string | number,
     end: Date | string | number,
     format: 'short' | 'long' = 'short'
   ): string {
-    const startObj = typeof start === 'string' || typeof start === 'number' ? new Date(start) : start
-    const endObj = typeof end === 'string' || typeof end === 'number' ? new Date(end) : end
+    const startObj = typeof start === 'string' || typeof start === 'number' ? new Date(start) : start;
+    const endObj = typeof end === 'string' || typeof end === 'number' ? new Date(end) : end;
     
-    const duration = intervalToDuration({ start: startObj, end: endObj })
+    const duration = intervalToDuration({ start: startObj, end: endObj });
     
-    const parts = []
-    if (duration.years) parts.push(`${duration.years}y`)
-    if (duration.months) parts.push(`${duration.months}mo`)
-    if (duration.days) parts.push(`${duration.days}d`)
-    if (duration.hours) parts.push(`${duration.hours}h`)
-    if (duration.minutes) parts.push(`${duration.minutes}m`)
-    if (duration.seconds) parts.push(`${duration.seconds}s`)
+    const parts = [];
+    if (duration.years) parts.push(`${duration.years}y`);
+    if (duration.months) parts.push(`${duration.months}mo`);
+    if (duration.days) parts.push(`${duration.days}d`);
+    if (duration.hours) parts.push(`${duration.hours}h`);
+    if (duration.minutes) parts.push(`${duration.minutes}m`);
+    if (duration.seconds) parts.push(`${duration.seconds}s`);
     
-    return parts.join(' ')
+    return parts.join(' ');
   }
 
   static formatRange(
@@ -384,69 +373,69 @@ export class DateFormatter {
     format: 'short' | 'medium' | 'long' = 'medium',
     locale: Locale = 'en'
   ): string {
-    const startStr = this.format(start, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale)
-    const endStr = this.format(end, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale)
+    const startStr = this.formatDate(start, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale);
+    const endStr = this.formatDate(end, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale);
     
-    return `${startStr} – ${endStr}`
+    return `${startStr} – ${endStr}`;
   }
 
   static formatTimeAgo(
     date: Date | string | number,
     options: { short?: boolean } = {}
   ): string {
-    const now = new Date()
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const diffMs = now.getTime() - dateObj.getTime()
-    const diffSec = Math.floor(diffMs / 1000)
-    const diffMin = Math.floor(diffSec / 60)
-    const diffHour = Math.floor(diffMin / 60)
-    const diffDay = Math.floor(diffHour / 24)
-    const diffWeek = Math.floor(diffDay / 7)
-    const diffMonth = Math.floor(diffDay / 30)
-    const diffYear = Math.floor(diffDay / 365)
+    const now = new Date();
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const diffMs = now.getTime() - dateObj.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+    const diffWeek = Math.floor(diffDay / 7);
+    const diffMonth = Math.floor(diffDay / 30);
+    const diffYear = Math.floor(diffDay / 365);
 
     if (options.short) {
-      if (diffSec < 60) return `${diffSec}s`
-      if (diffMin < 60) return `${diffMin}m`
-      if (diffHour < 24) return `${diffHour}h`
-      if (diffDay < 7) return `${diffDay}d`
-      if (diffWeek < 4) return `${diffWeek}w`
-      if (diffMonth < 12) return `${diffMonth}mo`
-      return `${diffYear}y`
+      if (diffSec < 60) return `${diffSec}s`;
+      if (diffMin < 60) return `${diffMin}m`;
+      if (diffHour < 24) return `${diffHour}h`;
+      if (diffDay < 7) return `${diffDay}d`;
+      if (diffWeek < 4) return `${diffWeek}w`;
+      if (diffMonth < 12) return `${diffMonth}mo`;
+      return `${diffYear}y`;
     }
 
-    if (diffSec < 60) return 'just now'
-    if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`
-    if (diffHour < 24) return `${diffHour} hour${diffHour === 1 ? '' : 's'} ago`
-    if (diffDay < 7) return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`
-    if (diffWeek < 4) return `${diffWeek} week${diffWeek === 1 ? '' : 's'} ago`
-    if (diffMonth < 12) return `${diffMonth} month${diffMonth === 1 ? '' : 's'} ago`
-    return `${diffYear} year${diffYear === 1 ? '' : 's'} ago`
+    if (diffSec < 60) return 'just now';
+    if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+    if (diffHour < 24) return `${diffHour} hour${diffHour === 1 ? '' : 's'} ago`;
+    if (diffDay < 7) return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
+    if (diffWeek < 4) return `${diffWeek} week${diffWeek === 1 ? '' : 's'} ago`;
+    if (diffMonth < 12) return `${diffMonth} month${diffMonth === 1 ? '' : 's'} ago`;
+    return `${diffYear} year${diffYear === 1 ? '' : 's'} ago`;
   }
 
   static formatISODate(date: Date | string | number): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    return dateObj.toISOString()
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    return dateObj.toISOString();
   }
 
   static formatISODateOnly(date: Date | string | number): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    return dateObj.toISOString().split('T')[0]
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    return dateObj.toISOString().split('T')[0];
   }
 
   static formatTime(date: Date | string | number, format: '12h' | '24h' = '24h'): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const hours = dateObj.getHours()
-    const minutes = dateObj.getMinutes()
-    const seconds = dateObj.getSeconds()
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const seconds = dateObj.getSeconds();
 
     if (format === '12h') {
-      const period = hours >= 12 ? 'PM' : 'AM'
-      const hour12 = hours % 12 || 12
-      return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const hour12 = hours % 12 || 12;
+      return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
     }
 
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
   static formatDateTime(
@@ -454,9 +443,9 @@ export class DateFormatter {
     format: 'short' | 'medium' | 'long' = 'medium',
     locale: Locale = 'en'
   ): string {
-    const dateStr = this.format(date, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale)
-    const timeStr = this.formatTime(date)
-    return `${dateStr} at ${timeStr}`
+    const dateStr = this.formatDate(date, format === 'short' ? 'PP' : format === 'medium' ? 'PPP' : 'PPPP', locale);
+    const timeStr = this.formatTime(date);
+    return `${dateStr} at ${timeStr}`;
   }
 
   static formatRelativeDateTime(
@@ -464,61 +453,61 @@ export class DateFormatter {
     baseDate: Date | string | number = new Date(),
     locale: Locale = 'en'
   ): string {
-    const diff = this.formatDistance(date, baseDate, { addSuffix: true }, locale)
-    const timeStr = this.formatTime(date)
-    return `${diff} at ${timeStr}`
+    const diff = formatDistance(date, baseDate, { addSuffix: true, locale: DATE_FNS_LOCALE[locale] });
+    const timeStr = this.formatTime(date);
+    return `${diff} at ${timeStr}`;
   }
 
   static formatCalendar(
     date: Date | string | number,
     locale: Locale = 'en'
   ): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
     if (dateObj.toDateString() === today.toDateString()) {
-      return `Today at ${this.formatTime(dateObj)}`
+      return `Today at ${this.formatTime(dateObj)}`;
     }
     if (dateObj.toDateString() === yesterday.toDateString()) {
-      return `Yesterday at ${this.formatTime(dateObj)}`
+      return `Yesterday at ${this.formatTime(dateObj)}`;
     }
     if (dateObj.toDateString() === tomorrow.toDateString()) {
-      return `Tomorrow at ${this.formatTime(dateObj)}`
+      return `Tomorrow at ${this.formatTime(dateObj)}`;
     }
 
-    return this.formatDateTime(dateObj, 'medium', locale)
+    return this.formatDateTime(dateObj, 'medium', locale);
   }
 
   static formatWeekday(date: Date | string | number, format: 'short' | 'long' = 'long'): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    return dateObj.toLocaleDateString('en-US', { weekday: format })
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', { weekday: format });
   }
 
   static formatMonth(date: Date | string | number, format: 'short' | 'long' = 'long'): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    return dateObj.toLocaleDateString('en-US', { month: format })
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', { month: format });
   }
 
   static formatQuarter(date: Date | string | number): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const month = dateObj.getMonth()
-    const quarter = Math.floor(month / 3) + 1
-    const year = dateObj.getFullYear()
-    return `Q${quarter} ${year}`
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const month = dateObj.getMonth();
+    const quarter = Math.floor(month / 3) + 1;
+    const year = dateObj.getFullYear();
+    return `Q${quarter} ${year}`;
   }
 
   static formatWeek(date: Date | string | number): string {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-    const start = new Date(dateObj)
-    start.setDate(start.getDate() - start.getDay())
-    const end = new Date(start)
-    end.setDate(end.getDate() + 6)
+    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const start = new Date(dateObj);
+    start.setDate(start.getDate() - start.getDay());
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
     
-    return `Week of ${this.formatShort(start)}`
+    return `Week of ${this.formatShort(start)}`;
   }
 }
 
@@ -528,58 +517,58 @@ export class DateFormatter {
 
 export class StringFormatter {
   static capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 
   static capitalizeWords(str: string): string {
-    return str.split(' ').map(word => this.capitalize(word)).join(' ')
+    return str.split(' ').map(word => this.capitalize(word)).join(' ');
   }
 
   static titleCase(str: string): string {
-    const smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i
+    const smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
     return str.toLowerCase().replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, (match, index, title) => {
       if (index > 0 && index + match.length !== title.length && match.search(smallWords) > -1 && title.charAt(index - 2) !== ':' && (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') && title.charAt(index - 1).search(/[^\s-]/) < 0) {
-        return match.toLowerCase()
+        return match.toLowerCase();
       }
-      return match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()
-    })
+      return match.charAt(0).toUpperCase() + match.slice(1).toLowerCase();
+    });
   }
 
   static camelCase(str: string): string {
     return str
       .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => index === 0 ? word.toLowerCase() : word.toUpperCase())
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, '');
   }
 
   static pascalCase(str: string): string {
     return str
       .replace(/(?:^\w|[A-Z]|\b\w)/g, word => word.toUpperCase())
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, '');
   }
 
   static snakeCase(str: string): string {
     return str
       .replace(/\s+/g, '_')
       .replace(/([a-z])([A-Z])/g, '$1_$2')
-      .toLowerCase()
+      .toLowerCase();
   }
 
   static kebabCase(str: string): string {
     return str
       .replace(/\s+/g, '-')
       .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .toLowerCase()
+      .toLowerCase();
   }
 
   static truncate(str: string, length: number, suffix: string = '...'): string {
-    if (str.length <= length) return str
-    return str.substring(0, length - suffix.length) + suffix
+    if (str.length <= length) return str;
+    return str.substring(0, length - suffix.length) + suffix;
   }
 
   static truncateWords(str: string, words: number, suffix: string = '...'): string {
-    const wordArray = str.split(' ')
-    if (wordArray.length <= words) return str
-    return wordArray.slice(0, words).join(' ') + suffix
+    const wordArray = str.split(' ');
+    if (wordArray.length <= words) return str;
+    return wordArray.slice(0, words).join(' ') + suffix;
   }
 
   static slugify(str: string): string {
@@ -588,83 +577,83 @@ export class StringFormatter {
       .trim()
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+      .replace(/^-+|-+$/g, '');
   }
 
   static pluralize(count: number, singular: string, plural?: string): string {
-    if (count === 1) return singular
-    return plural || singular + 's'
+    if (count === 1) return singular;
+    return plural || singular + 's';
   }
 
   static ordinalSuffix(num: number): string {
-    const j = num % 10
-    const k = num % 100
-    if (j === 1 && k !== 11) return 'st'
-    if (j === 2 && k !== 12) return 'nd'
-    if (j === 3 && k !== 13) return 'rd'
-    return 'th'
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return 'st';
+    if (j === 2 && k !== 12) return 'nd';
+    if (j === 3 && k !== 13) return 'rd';
+    return 'th';
   }
 
   static formatPhone(phone: string, country: 'US' | 'UK' | 'default' = 'US'): string {
-    const cleaned = phone.replace(/\D/g, '')
+    const cleaned = phone.replace(/\D/g, '');
     
     if (country === 'US' && cleaned.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
     }
     
     if (country === 'UK' && cleaned.length === 11) {
-      return `+44 ${cleaned.slice(1, 4)} ${cleaned.slice(4, 7)} ${cleaned.slice(7, 11)}`
+      return `+44 ${cleaned.slice(1, 4)} ${cleaned.slice(4, 7)} ${cleaned.slice(7, 11)}`;
     }
     
-    return phone
+    return phone;
   }
 
   static formatSSN(ssn: string): string {
-    const cleaned = ssn.replace(/\D/g, '')
+    const cleaned = ssn.replace(/\D/g, '');
     if (cleaned.length === 9) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
     }
-    return ssn
+    return ssn;
   }
 
   static formatCreditCard(card: string): string {
-    const cleaned = card.replace(/\D/g, '')
-    const match = cleaned.match(/.{1,4}/g)
-    return match ? match.join(' ') : card
+    const cleaned = card.replace(/\D/g, '');
+    const matches = cleaned.match(/.{1,4}/g);
+    return matches ? matches.join(' ') : card;
   }
 
   static obfuscateEmail(email: string): string {
-    const [local, domain] = email.split('@')
-    if (!domain) return email
+    const [local, domain] = email.split('@');
+    if (!domain) return email;
     
     const obfuscatedLocal = local.length > 2
       ? local.slice(0, 2) + '*'.repeat(local.length - 2)
-      : local + '*'.repeat(2)
+      : local + '*'.repeat(2);
     
-    const [domainName, tld] = domain.split('.')
+    const [domainName, tld] = domain.split('.');
     const obfuscatedDomain = domainName.length > 2
       ? domainName.slice(0, 2) + '*'.repeat(domainName.length - 2)
-      : domainName + '*'.repeat(2)
+      : domainName + '*'.repeat(2);
     
-    return `${obfuscatedLocal}@${obfuscatedDomain}.${tld}`
+    return `${obfuscatedLocal}@${obfuscatedDomain}.${tld}`;
   }
 
   static obfuscatePhone(phone: string): string {
-    const cleaned = phone.replace(/\D/g, '')
+    const cleaned = phone.replace(/\D/g, '');
     if (cleaned.length >= 10) {
-      return '*'.repeat(cleaned.length - 4) + cleaned.slice(-4)
+      return '*'.repeat(cleaned.length - 4) + cleaned.slice(-4);
     }
-    return '*'.repeat(cleaned.length)
+    return '*'.repeat(cleaned.length);
   }
 
   static highlight(text: string, query: string): string {
-    if (!query) return text
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
-    return text.replace(regex, '<mark>$1</mark>')
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
   }
 
   static template(template: string, data: Record<string, any>): string {
-    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => data[key]?.toString() || '')
+    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => data[key]?.toString() || '');
   }
 }
 
@@ -674,40 +663,40 @@ export class StringFormatter {
 
 export class AddressFormatter {
   static format(address: {
-    line1: string
-    line2?: string
-    city: string
-    state: string
-    postalCode: string
-    country: string
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
   }): string {
-    const parts = [address.line1]
-    if (address.line2) parts.push(address.line2)
-    parts.push(`${address.city}, ${address.state} ${address.postalCode}`)
-    parts.push(address.country)
-    return parts.join('\n')
+    const parts = [address.line1];
+    if (address.line2) parts.push(address.line2);
+    parts.push(`${address.city}, ${address.state} ${address.postalCode}`);
+    parts.push(address.country);
+    return parts.join('\n');
   }
 
   static formatOneLine(address: {
-    line1: string
-    line2?: string
-    city: string
-    state: string
-    postalCode: string
-    country: string
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
   }): string {
-    const parts = [address.line1]
-    if (address.line2) parts.push(address.line2)
-    parts.push(`${address.city}, ${address.state} ${address.postalCode}, ${address.country}`)
-    return parts.join(' ')
+    const parts = [address.line1];
+    if (address.line2) parts.push(address.line2);
+    parts.push(`${address.city}, ${address.state} ${address.postalCode}, ${address.country}`);
+    return parts.join(' ');
   }
 
   static formatShort(address: {
-    city: string
-    state: string
-    country: string
+    city: string;
+    state: string;
+    country: string;
   }): string {
-    return `${address.city}, ${address.state}, ${address.country}`
+    return `${address.city}, ${address.state}, ${address.country}`;
   }
 }
 
@@ -717,45 +706,45 @@ export class AddressFormatter {
 
 export class DurationFormatter {
   static format(seconds: number, format: 'short' | 'long' = 'short'): string {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
     if (format === 'short') {
-      const parts = []
-      if (hours > 0) parts.push(`${hours}h`)
-      if (minutes > 0) parts.push(`${minutes}m`)
-      if (secs > 0 || parts.length === 0) parts.push(`${secs}s`)
-      return parts.join(' ')
+      const parts = [];
+      if (hours > 0) parts.push(`${hours}h`);
+      if (minutes > 0) parts.push(`${minutes}m`);
+      if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
+      return parts.join(' ');
     }
 
-    const parts = []
-    if (hours > 0) parts.push(`${hours} hour${hours === 1 ? '' : 's'}`)
-    if (minutes > 0) parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`)
-    if (secs > 0 || parts.length === 0) parts.push(`${secs} second${secs === 1 ? '' : 's'}`)
-    return parts.join(', ')
+    const parts = [];
+    if (hours > 0) parts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
+    if (minutes > 0) parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
+    if (secs > 0 || parts.length === 0) parts.push(`${secs} second${secs === 1 ? '' : 's'}`);
+    return parts.join(', ');
   }
 
   static formatHuman(seconds: number): string {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
     if (hours > 0) {
-      return `${hours}h ${minutes}m`
+      return `${hours}h ${minutes}m`;
     }
     if (minutes > 0) {
-      return `${minutes}m ${secs}s`
+      return `${minutes}m ${secs}s`;
     }
-    return `${secs}s`
+    return `${secs}s`;
   }
 
   static formatDigital(seconds: number): string {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 }
 
@@ -770,6 +759,6 @@ export const formatters = {
   string: StringFormatter,
   address: AddressFormatter,
   duration: DurationFormatter
-}
+};
 
-export default formatters
+export default formatters;
