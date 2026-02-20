@@ -34,16 +34,6 @@ export const formatPercent = (value: number, decimals: number = 1): string => {
   return `${(value * 100).toFixed(decimals)}%`;
 };
 
-export const formatCompact = (num: number): string => {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(1)}M`;
-  }
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}K`;
-  }
-  return num.toString();
-};
-
 // ============================================================================
 // DATE FORMATTER
 // ============================================================================
@@ -92,10 +82,6 @@ export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-export const capitalizeWords = (str: string): string => {
-  return str.split(' ').map(word => capitalize(word)).join(' ');
-};
-
 export const truncate = (str: string, length: number): string => {
   if (str.length <= length) return str;
   return str.substring(0, length) + '...';
@@ -121,8 +107,7 @@ export const formatters = {
   },
   number: {
     format: formatNumber,
-    percent: formatPercent,
-    compact: formatCompact
+    percent: formatPercent
   },
   date: {
     format: formatDate,
@@ -131,7 +116,6 @@ export const formatters = {
   },
   string: {
     capitalize,
-    capitalizeWords,
     truncate,
     slugify
   }
