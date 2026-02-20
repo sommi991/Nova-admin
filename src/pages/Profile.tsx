@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  User, Mail, Phone, MapPin, Calendar, Clock,
-  Edit, Camera, Save, Award, Star, Gift,
-  ShoppingBag, DollarSign, TrendingUp, Heart,
-  Settings, LogOut, Shield, BadgeCheck,
-  MessageSquare, Bell, Download, Share2
+  User, Mail, Phone, MapPin, Calendar, Edit, Camera, Save,
+  ShoppingBag, DollarSign, TrendingUp, Star, Award,
+  Settings, Shield, BadgeCheck, MessageSquare
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { useUserStore, useUIStore } from '../store/store'
+import { useUserStore } from '../store/store'
 import { format, formatDistance } from 'date-fns'
 
 // ============================================================================
@@ -41,7 +39,6 @@ export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'security'>('overview')
 
   const userState = useUserStore()
-  const uiState = useUIStore()
 
   // Form state
   const [formData, setFormData] = useState({
@@ -122,13 +119,6 @@ export const Profile: React.FC = () => {
       description: 'Updated store settings',
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
       icon: Settings
-    },
-    {
-      id: '5',
-      type: 'order',
-      description: 'Refunded order #ORD-12300',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-      icon: ShoppingBag
     }
   ]
 
@@ -279,58 +269,6 @@ export const Profile: React.FC = () => {
               ) : (
                 <p className="text-gray-400 text-sm">{formData.bio}</p>
               )}
-            </div>
-
-            {/* Social links */}
-            <div className="mt-6 pt-6 border-t border-dark-border">
-              <h3 className="text-white font-medium mb-4">Social Links</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Website</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="bg-dark-hover border border-dark-border rounded-lg px-3 py-1 text-sm text-white w-48"
-                    />
-                  ) : (
-                    <a href={formData.website} className="text-sm text-cosmic-purple hover:text-electric-blue">
-                      {formData.website}
-                    </a>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Twitter</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={formData.twitter}
-                      onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
-                      className="bg-dark-hover border border-dark-border rounded-lg px-3 py-1 text-sm text-white w-48"
-                    />
-                  ) : (
-                    <a href={`https://twitter.com/${formData.twitter}`} className="text-sm text-cosmic-purple hover:text-electric-blue">
-                      {formData.twitter}
-                    </a>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">GitHub</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={formData.github}
-                      onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                      className="bg-dark-hover border border-dark-border rounded-lg px-3 py-1 text-sm text-white w-48"
-                    />
-                  ) : (
-                    <a href={`https://github.com/${formData.github}`} className="text-sm text-cosmic-purple hover:text-electric-blue">
-                      {formData.github}
-                    </a>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -512,7 +450,7 @@ export const Profile: React.FC = () => {
 
                   <div className="flex items-center justify-between p-4 bg-dark-hover rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <Clock className="w-5 h-5 text-warning-orange" />
+                      <Calendar className="w-5 h-5 text-warning-orange" />
                       <div>
                         <p className="text-white text-sm font-medium">Last Password Change</p>
                         <p className="text-xs text-gray-400">30 days ago</p>
@@ -535,25 +473,6 @@ export const Profile: React.FC = () => {
                       Manage
                     </button>
                   </div>
-                </div>
-              </div>
-
-              <div className="glass-card p-6">
-                <h3 className="text-white font-medium mb-4">Login History</h3>
-                <div className="space-y-3">
-                  {[
-                    { device: 'Chrome on macOS', location: 'New York, NY', time: '2 hours ago', ip: '192.168.1.1' },
-                    { device: 'Safari on iPhone', location: 'New York, NY', time: '2 days ago', ip: '192.168.1.1' },
-                    { device: 'Firefox on Windows', location: 'New York, NY', time: '1 week ago', ip: '192.168.1.1' }
-                  ].map((session, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-dark-hover rounded-lg">
-                      <div>
-                        <p className="text-white text-sm">{session.device}</p>
-                        <p className="text-xs text-gray-400">{session.location} • {session.ip}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">{session.time}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
