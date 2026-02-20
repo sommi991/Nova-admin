@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  FileText, Download, Calendar, Filter, BarChart3,
+  FileText, Download, Calendar, BarChart3,
   PieChart, TrendingUp, DollarSign,
-  ShoppingBag, Users, Package, Clock, Printer,
-  Mail, Share2, RefreshCw, Save,
-  ChevronDown, ChevronRight
+  ShoppingBag, Users, Package, Clock, Mail,
+  RefreshCw, ChevronDown
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { format, subDays, subMonths } from 'date-fns'
@@ -202,11 +201,7 @@ const DateRangePicker: React.FC<{
     { label: 'Today', days: 0 },
     { label: 'Yesterday', days: 1 },
     { label: 'Last 7 days', days: 7 },
-    { label: 'Last 30 days', days: 30 },
-    { label: 'This month', days: 'month' },
-    { label: 'Last month', days: 'lastMonth' },
-    { label: 'This year', days: 'year' },
-    { label: 'Custom', days: 'custom' }
+    { label: 'Last 30 days', days: 30 }
   ]
 
   return (
@@ -227,7 +222,7 @@ const DateRangePicker: React.FC<{
               key={range.label}
               onClick={() => {
                 const end = new Date()
-                const start = range.days === 0 ? new Date() : subDays(end, range.days as number)
+                const start = range.days === 0 ? new Date() : subDays(end, range.days)
                 onChange({
                   start,
                   end,
@@ -298,10 +293,6 @@ export const Reports: React.FC = () => {
 
   const handleEmailReport = () => {
     toast.success('Report scheduled for email delivery')
-  }
-
-  const handleScheduleReport = () => {
-    toast.success('Report schedule configured')
   }
 
   return (
@@ -443,7 +434,7 @@ export const Reports: React.FC = () => {
         </button>
 
         <button
-          onClick={handleScheduleReport}
+          onClick={() => toast.success('Schedule reports opened')}
           className="glass-card p-4 hover:scale-105 transition-all flex items-center space-x-4"
         >
           <div className="p-3 bg-cosmic-purple/20 rounded-xl">
