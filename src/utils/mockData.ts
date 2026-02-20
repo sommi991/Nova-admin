@@ -18,7 +18,8 @@ import type {
   OrderStatus,
   CustomerStatus,
   PaymentStatus,
-  FulfillmentStatus
+  FulfillmentStatus,
+  Tag
 } from '../types';
 
 // Initialize faker with seed for consistent data
@@ -158,6 +159,19 @@ export const REVIEW_CONTENTS = [
 ];
 
 // ============================================================================
+// TAG GENERATOR (NEW)
+// ============================================================================
+
+export const generateTag = (name: string): Tag => {
+  return {
+    id: generateId('tag'),
+    name,
+    slug: faker.helpers.slugify(name).toLowerCase(),
+    count: randomInt(0, 100)
+  };
+};
+
+// ============================================================================
 // GENERATORS
 // ============================================================================
 
@@ -173,10 +187,6 @@ export const generateEmail = (firstName: string, lastName: string): string => {
 export const generatePhone = (): string => {
   return `+1 ${faker.string.numeric(3)}-${faker.string.numeric(3)}-${faker.string.numeric(4)}`;
 };
-
-// ============================================================================
-// FIXED ADDRESS GENERATOR - Now includes 'type' property
-// ============================================================================
 
 export const generateAddress = (type: 'shipping' | 'billing' | 'both' = 'both', countryCode?: string) => {
   const country = countryCode 
@@ -202,7 +212,7 @@ export const generateAddress = (type: 'shipping' | 'billing' | 'both' = 'both', 
 };
 
 // ============================================================================
-// STORE GENERATOR - Updated to use fixed address generator
+// STORE GENERATOR
 // ============================================================================
 
 export const generateStore = (): Store => {
@@ -422,7 +432,7 @@ export const generateBrand = (): Brand => {
 };
 
 // ============================================================================
-// PRODUCT GENERATOR
+// PRODUCT GENERATOR (FIXED)
 // ============================================================================
 
 export const generateProduct = (
@@ -442,7 +452,6 @@ export const generateProduct = (
   const price = randomFloat(19.99, 999.99);
   const cost = price * randomFloat(0.4, 0.7);
   const quantity = randomInt(0, 100);
-  const sold = randomInt(0, 200);
   
   return {
     id,
@@ -458,7 +467,7 @@ export const generateProduct = (
     status: randomArrayItem<ProductStatus>(['active', 'active', 'active', 'draft', 'inactive']),
     visibility: randomArrayItem(['visible', 'visible', 'visible', 'hidden']),
     categories: [category.id],
-    tags: Array.from({ length: randomInt(1, 5) }, () => faker.commerce.productAdjective()),
+    tags: Array.from({ length: randomInt(1, 5) }, () => generateTag(faker.commerce.productAdjective())),
     brand,
     images: Array.from({ length: randomInt(1, 5) }, (_, i) => ({
       id: generateId('img'),
@@ -539,7 +548,7 @@ export const generateProduct = (
 };
 
 // ============================================================================
-// CUSTOMER GENERATOR - Updated to use fixed address generator
+// CUSTOMER GENERATOR
 // ============================================================================
 
 export const generateCustomer = (storeId: string): Customer => {
@@ -565,7 +574,7 @@ export const generateCustomer = (storeId: string): Customer => {
       generateAddress(i === 0 ? 'both' : 'shipping', 'US')
     ),
     groups: [],
-    tags: randomArraySlice(['vip', 'repeat', 'new', 'at-risk', 'high-value'], 0, 3),
+    tags: randomArraySlice(['vip', 'repeat', 'new', 'at-risk', 'high-value'], 0, 3).map(tagName => generateTag(tagName)),
     notes: [],
     segments: [],
     metadata: {},
@@ -677,11 +686,9 @@ export const generateOrder = (
   const discountTotal = randomBoolean(0.3) ? randomFloat(5, 20) : 0;
   const total = subtotal + shippingTotal + taxTotal - discountTotal;
 
-  // Order status - valid values: 'pending', 'processing', 'confirmed', 'completed', 'cancelled'
   const statuses: OrderStatus[] = ['pending', 'processing', 'confirmed', 'completed', 'cancelled'];
   const status = randomArrayItem(statuses);
   
-  // Fulfillment status - valid values: 'unfulfilled', 'fulfilled', 'shipped', 'delivered'
   const fulfillmentStatuses: FulfillmentStatus[] = ['unfulfilled', 'fulfilled', 'shipped', 'delivered'];
   const fulfillmentStatus = randomArrayItem(fulfillmentStatuses);
   
@@ -736,7 +743,7 @@ export const generateOrder = (
       createdBy: 'system',
       createdAt: addDays(createdAt, randomInt(0, 2))
     }] : [],
-    tags: randomBoolean(0.2) ? ['gift', 'priority'] : [],
+    tags: randomBoolean(0.2) ? ['gift', 'priority'].map(tagName => generateTag(tagName)) : [],
     tracking: fulfillmentStatus === 'shipped' || fulfillmentStatus === 'delivered' ? [{
       id: generateId('track'),
       carrier: randomArrayItem(['UPS', 'FedEx', 'USPS']),
@@ -917,7 +924,7 @@ export const generateTicket = (customerId: string): Ticket => {
         createdAt: subDays(now, randomInt(1, 3))
       }
     ],
-    tags: randomArraySlice(['urgent', 'refund', 'return'], 0, 2),
+    tags: randomArraySlice(['urgent', 'refund', 'return'], 0, 2).map(tagName => generateTag(tagName)),
     metadata: {},
     createdAt: subDays(now, randomInt(1, 7)),
     updatedAt: now
@@ -935,7 +942,6 @@ export const generateAnalyticsData = (
   const now = new Date();
   const start = subDays(now, days);
   
-  // Generate daily data (used for internal calculations)
   const dailyData = Array.from({ length: days }, (_, i) => {
     const date = subDays(now, days - 1 - i);
     const dayOrders = orders.filter(o => 
@@ -951,7 +957,6 @@ export const generateAnalyticsData = (
     };
   });
 
-  // Calculate totals from dailyData
   const totalRevenue = dailyData.reduce((sum, d) => sum + d.revenue, 0);
   const totalOrders = dailyData.reduce((sum, d) => sum + d.orders, 0);
   const totalCustomers = dailyData.reduce((sum, d) => sum + d.customers, 0);
@@ -1079,16 +1084,13 @@ export const generateAnalyticsData = (
 export const generateMockData = () => {
   console.log('🚀 Generating mock data...');
   
-  // Generate stores
   const stores = Array.from({ length: MOCK_CONFIG.storeCount }, generateStore);
   const storeIds = stores.map(s => s.id);
   
-  // Generate users
   const users = storeIds.flatMap(storeId => 
     Array.from({ length: 3 }, () => generateUser(storeId))
   );
   
-  // Generate categories (with hierarchy)
   const topLevelCategories = Array.from(
     { length: MOCK_CONFIG.categoryCount / 2 },
     () => generateCategory()
@@ -1100,10 +1102,8 @@ export const generateMockData = () => {
   
   const categories = [...topLevelCategories, ...subCategories];
   
-  // Generate brands
   const brands = Array.from({ length: MOCK_CONFIG.brandCount }, generateBrand);
   
-  // Generate products
   const products = storeIds.flatMap(storeId => 
     Array.from(
       { length: MOCK_CONFIG.productCount / storeIds.length },
@@ -1111,7 +1111,6 @@ export const generateMockData = () => {
     )
   );
   
-  // Generate customers
   const customers = storeIds.flatMap(storeId => 
     Array.from(
       { length: MOCK_CONFIG.customerCount / storeIds.length },
@@ -1119,7 +1118,6 @@ export const generateMockData = () => {
     )
   );
   
-  // Generate orders
   const orders = storeIds.flatMap(storeId => 
     Array.from(
       { length: MOCK_CONFIG.orderCount / storeIds.length },
@@ -1127,7 +1125,6 @@ export const generateMockData = () => {
     )
   ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   
-  // Generate reviews
   const reviews = products.flatMap(product => 
     Array.from(
       { length: randomInt(0, 5) },
@@ -1139,13 +1136,10 @@ export const generateMockData = () => {
     )
   );
   
-  // Generate discounts
   const discounts = Array.from({ length: MOCK_CONFIG.discountCount }, generateDiscount);
   
-  // Generate campaigns
   const campaigns = Array.from({ length: MOCK_CONFIG.campaignCount }, generateCampaign);
   
-  // Generate tickets
   const tickets = customers.flatMap(customer => 
     Array.from(
       { length: randomInt(0, 2) },
@@ -1153,7 +1147,6 @@ export const generateMockData = () => {
     )
   );
   
-  // Generate analytics
   const analytics = generateAnalyticsData(30, orders);
   
   console.log('✅ Mock data generated successfully!');
@@ -1178,9 +1171,5 @@ export const generateMockData = () => {
     analytics
   };
 };
-
-// ============================================================================
-// EXPORT DEFAULT DATA
-// ============================================================================
 
 export default generateMockData;
