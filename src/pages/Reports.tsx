@@ -2,20 +2,16 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   FileText, Download, Calendar, Filter, BarChart3,
-  PieChart, LineChart, TrendingUp, DollarSign,
+  PieChart, TrendingUp, DollarSign,
   ShoppingBag, Users, Package, Clock, Printer,
-  Mail, Share2, Eye, RefreshCw, Save,
-  ChevronDown, ChevronRight, Award, Star
+  Mail, Share2, RefreshCw, Save,
+  ChevronDown, ChevronRight
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { format, subDays, subMonths } from 'date-fns'
 import {
-  LineChart as ReLineChart,
-  Line,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   PieChart as RePieChart,
   Pie,
   Cell,
@@ -23,7 +19,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts'
 
@@ -121,9 +116,7 @@ const REPORTS: Report[] = [
 
 const salesData = Array.from({ length: 12 }, (_, i) => ({
   month: format(subMonths(new Date(), 11 - i), 'MMM'),
-  revenue: Math.floor(Math.random() * 50000) + 30000,
-  orders: Math.floor(Math.random() * 500) + 200,
-  profit: Math.floor(Math.random() * 20000) + 10000
+  revenue: Math.floor(Math.random() * 50000) + 30000
 }))
 
 const categoryData = [
@@ -133,12 +126,6 @@ const categoryData = [
   { name: 'Sports', value: 12, color: '#10B981' },
   { name: 'Beauty', value: 8, color: '#EC4899' }
 ]
-
-const customerData = Array.from({ length: 6 }, (_, i) => ({
-  month: format(subMonths(new Date(), 5 - i), 'MMM'),
-  new: Math.floor(Math.random() * 200) + 100,
-  returning: Math.floor(Math.random() * 150) + 50
-}))
 
 // ============================================================================
 // REPORT CARD COMPONENT
@@ -281,7 +268,6 @@ export const Reports: React.FC = () => {
       icon: '📊',
       duration: 3000
     })
-    // Simulate generation
     setTimeout(() => {
       toast.success(`${report.name} generated successfully!`, {
         icon: '✅'
@@ -372,7 +358,7 @@ export const Reports: React.FC = () => {
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white">Revenue Trend</h2>
-            <LineChart className="w-5 h-5 text-gray-400" />
+            <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={salesData}>
