@@ -1,4 +1,4 @@
-imporimport { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { subDays, subHours, subMonths, addDays } from 'date-fns';
 
 // ============================================================================
