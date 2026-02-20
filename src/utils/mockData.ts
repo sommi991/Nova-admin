@@ -174,12 +174,18 @@ export const generatePhone = (): string => {
   return `+1 ${faker.string.numeric(3)}-${faker.string.numeric(3)}-${faker.string.numeric(4)}`;
 };
 
-export const generateAddress = (countryCode?: string) => {
+// ============================================================================
+// FIXED ADDRESS GENERATOR - Now includes 'type' property
+// ============================================================================
+
+export const generateAddress = (type: 'shipping' | 'billing' | 'both' = 'both', countryCode?: string) => {
   const country = countryCode 
     ? COUNTRIES.find(c => c.code === countryCode) || COUNTRIES[0]
     : randomArrayItem(COUNTRIES);
   
   return {
+    id: generateId('addr'),
+    type,
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     company: randomBoolean(0.3) ? faker.company.name() : undefined,
@@ -196,7 +202,7 @@ export const generateAddress = (countryCode?: string) => {
 };
 
 // ============================================================================
-// STORE GENERATOR
+// STORE GENERATOR - Updated to use fixed address generator
 // ============================================================================
 
 export const generateStore = (): Store => {
@@ -213,7 +219,7 @@ export const generateStore = (): Store => {
     brandColor: faker.color.rgb(),
     email: generateEmail('store', name),
     phone: generatePhone(),
-    address: generateAddress('US'),
+    address: generateAddress('both', 'US'),
     currency: randomArrayItem(['USD', 'EUR', 'GBP']),
     timezone: 'America/New_York',
     language: 'en',
@@ -227,7 +233,7 @@ export const generateStore = (): Store => {
         nexusAddresses: []
       },
       shipping: {
-        origin: generateAddress('US'),
+        origin: generateAddress('both', 'US'),
         methods: [],
         zones: [],
         packages: [],
@@ -533,7 +539,7 @@ export const generateProduct = (
 };
 
 // ============================================================================
-// CUSTOMER GENERATOR
+// CUSTOMER GENERATOR - Updated to use fixed address generator
 // ============================================================================
 
 export const generateCustomer = (storeId: string): Customer => {
@@ -555,11 +561,9 @@ export const generateCustomer = (storeId: string): Customer => {
     avatar: faker.image.avatar(),
     dateOfBirth: randomBoolean(0.7) ? faker.date.birthdate() : undefined,
     gender: randomArrayItem(['male', 'female', 'other']),
-    addresses: Array.from({ length: randomInt(1, 3) }, (_, i) => ({
-      ...generateAddress('US'),
-      id: generateId('addr'),
-      isDefault: i === 0
-    })),
+    addresses: Array.from({ length: randomInt(1, 3) }, (_, i) => 
+      generateAddress(i === 0 ? 'both' : 'shipping', 'US')
+    ),
     groups: [],
     tags: randomArraySlice(['vip', 'repeat', 'new', 'at-risk', 'high-value'], 0, 3),
     notes: [],
@@ -632,7 +636,7 @@ export const generateCustomer = (storeId: string): Customer => {
 };
 
 // ============================================================================
-// ORDER GENERATOR (FIXED VERSION - USING CORRECT STATUS TYPES)
+// ORDER GENERATOR
 // ============================================================================
 
 export const generateOrder = (
@@ -723,7 +727,6 @@ export const generateOrder = (
     createdAt,
     updatedAt: status === 'completed' ? addDays(createdAt, randomInt(1, 5)) : now,
     processedAt: status !== 'pending' ? addDays(createdAt, randomInt(0, 2)) : undefined,
-    // Use fulfillmentStatus instead of status for these fields
     fulfilledAt: fulfillmentStatus !== 'unfulfilled' ? addDays(createdAt, randomInt(2, 5)) : undefined,
     cancelledAt: status === 'cancelled' ? addDays(createdAt, randomInt(1, 3)) : undefined,
     notes: randomBoolean(0.3) ? [{
@@ -734,7 +737,6 @@ export const generateOrder = (
       createdAt: addDays(createdAt, randomInt(0, 2))
     }] : [],
     tags: randomBoolean(0.2) ? ['gift', 'priority'] : [],
-    // Use fulfillmentStatus for tracking as well
     tracking: fulfillmentStatus === 'shipped' || fulfillmentStatus === 'delivered' ? [{
       id: generateId('track'),
       carrier: randomArrayItem(['UPS', 'FedEx', 'USPS']),
