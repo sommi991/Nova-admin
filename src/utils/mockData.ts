@@ -1,15 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { subDays, subHours, subMonths, addDays } from 'date-fns';
+import { subDays, subMonths } from 'date-fns';
 
 // ============================================================================
-// SIMPLE TYPE DEFINITIONS (to avoid import errors)
+// SIMPLE TYPE DEFINITIONS
 // ============================================================================
-
-type ProductStatus = 'active' | 'draft' | 'inactive' | 'archived';
-type OrderStatus = 'pending' | 'processing' | 'confirmed' | 'completed' | 'cancelled';
-type CustomerStatus = 'active' | 'inactive' | 'blocked';
-type PaymentStatus = 'paid' | 'unpaid' | 'pending' | 'failed';
-type FulfillmentStatus = 'unfulfilled' | 'fulfilled' | 'shipped' | 'delivered';
 
 interface Product {
   id: string;
@@ -21,8 +15,8 @@ interface Product {
   category: string;
   stock: number;
   image: string;
-  tags: string[]; // Simple string array
-  status: ProductStatus;
+  tags: string[];
+  status: 'active' | 'draft' | 'inactive';
   createdAt: Date;
 }
 
@@ -33,10 +27,10 @@ interface Order {
   customerName: string;
   customerEmail: string;
   total: number;
-  status: OrderStatus;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
   items: any[];
+  tags: string[];
   createdAt: Date;
-  tags: string[]; // Simple string array
 }
 
 interface Customer {
@@ -47,8 +41,8 @@ interface Customer {
   phone: string;
   totalOrders: number;
   totalSpent: number;
-  tags: string[]; // Simple string array
-  status: CustomerStatus;
+  tags: string[];
+  status: 'active' | 'inactive';
   createdAt: Date;
 }
 
@@ -64,7 +58,7 @@ export const MOCK_CONFIG = {
 };
 
 // ============================================================================
-// UTILITY FUNCTIONS
+// UTILITY FUNCTIONS (only what we actually use)
 // ============================================================================
 
 const randomInt = (min: number, max: number): number => 
@@ -73,15 +67,8 @@ const randomInt = (min: number, max: number): number =>
 const randomFloat = (min: number, max: number, decimals = 2): number => 
   Number((Math.random() * (max - min) + min).toFixed(decimals));
 
-const randomBoolean = (probability = 0.5): boolean => Math.random() < probability;
-
 const randomArrayItem = <T>(array: T[]): T => 
   array[Math.floor(Math.random() * array.length)];
-
-const randomArraySlice = <T>(array: T[], min = 1, max = array.length): T[] => {
-  const count = randomInt(min, max);
-  return [...array].sort(() => 0.5 - Math.random()).slice(0, count);
-};
 
 const randomDate = (start: Date, end: Date): Date => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
@@ -94,8 +81,7 @@ const randomDate = (start: Date, end: Date): Date => {
 const PRODUCT_NAMES = [
   'Wireless Headphones', 'Gaming Mouse', '4K Monitor', 'Mechanical Keyboard',
   'USB-C Hub', 'Phone Case', 'Screen Protector', 'Power Bank',
-  'Smart Watch', 'Bluetooth Speaker', 'Laptop Stand', 'Webcam',
-  'Microphone', 'Desk Mat', 'Gaming Chair', 'External SSD'
+  'Smart Watch', 'Bluetooth Speaker', 'Laptop Stand', 'Webcam'
 ];
 
 const CATEGORIES = [
@@ -108,8 +94,7 @@ const CUSTOMER_NAMES = [
 ];
 
 const TAG_POOL = [
-  'vip', 'new', 'repeat', 'at-risk', 'high-value', 'low-value',
-  'electronics', 'gaming', 'audio', 'premium', 'budget', 'sale'
+  'vip', 'new', 'repeat', 'at-risk', 'high-value', 'electronics', 'gaming', 'premium'
 ];
 
 // ============================================================================
@@ -134,10 +119,7 @@ export const generatePhone = (): string => {
 // ============================================================================
 
 export const generateProduct = (storeId: string): Product => {
-  const id = generateId('prod');
   const name = randomArrayItem(PRODUCT_NAMES);
-  const price = randomFloat(19.99, 499.99);
-  const stock = randomInt(0, 100);
   
   // Generate 1-3 random tags
   const tagCount = randomInt(1, 3);
@@ -147,14 +129,14 @@ export const generateProduct = (storeId: string): Product => {
   }
   
   return {
-    id,
+    id: generateId('prod'),
     storeId,
     sku: `SKU-${randomInt(1000, 9999)}`,
     name,
     description: faker.lorem.sentence(),
-    price,
+    price: randomFloat(19.99, 499.99),
     category: randomArrayItem(CATEGORIES),
-    stock,
+    stock: randomInt(0, 100),
     image: `https://picsum.photos/200/200?random=${randomInt(1, 1000)}`,
     tags,
     status: randomArrayItem(['active', 'active', 'active', 'draft']),
@@ -167,9 +149,7 @@ export const generateProduct = (storeId: string): Product => {
 // ============================================================================
 
 export const generateCustomer = (storeId: string): Customer => {
-  const id = generateId('cust');
   const name = randomArrayItem(CUSTOMER_NAMES);
-  const email = generateEmail(name);
   const totalOrders = randomInt(0, 20);
   const totalSpent = totalOrders * randomFloat(50, 200);
   
@@ -181,10 +161,10 @@ export const generateCustomer = (storeId: string): Customer => {
   }
   
   return {
-    id,
+    id: generateId('cust'),
     storeId,
     name,
-    email,
+    email: generateEmail(name),
     phone: generatePhone(),
     totalOrders,
     totalSpent,
@@ -200,30 +180,27 @@ export const generateCustomer = (storeId: string): Customer => {
 
 export const generateOrder = (
   storeId: string,
-  customers: Customer[],
-  products: Product[]
+  customers: Customer[]
 ): Order => {
-  const id = generateId('ord');
   const customer = randomArrayItem(customers);
-  const itemCount = randomInt(1, 5);
-  const total = itemCount * randomFloat(50, 200);
+  const total = randomFloat(50, 500);
   
   // Generate 0-2 random tags
   const tagCount = randomInt(0, 2);
   const tags: string[] = [];
   for (let i = 0; i < tagCount; i++) {
-    tags.push(randomArrayItem(['gift', 'priority', 'express', 'international']));
+    tags.push(randomArrayItem(['gift', 'priority', 'express']));
   }
   
   return {
-    id,
+    id: generateId('ord'),
     storeId,
     orderNumber: `ORD-${randomInt(10000, 99999)}`,
     customerName: customer.name,
     customerEmail: customer.email,
     total,
     status: randomArrayItem(['pending', 'processing', 'completed', 'cancelled']),
-    items: Array(itemCount).fill({}),
+    items: [],
     tags,
     createdAt: randomDate(subDays(new Date(), 30), new Date())
   };
@@ -253,7 +230,7 @@ export const generateMockData = () => {
   // Generate orders
   const orders: Order[] = [];
   for (let i = 0; i < MOCK_CONFIG.orderCount; i++) {
-    orders.push(generateOrder(storeId, customers, products));
+    orders.push(generateOrder(storeId, customers));
   }
   
   // Sort orders by date (newest first)
