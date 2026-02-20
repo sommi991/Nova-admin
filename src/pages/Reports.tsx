@@ -4,7 +4,7 @@ import {
   FileText, Download, Calendar, Filter, BarChart3,
   PieChart, LineChart, TrendingUp, DollarSign,
   ShoppingBag, Users, Package, Clock, Printer,
-  Mail, Share2, Eye, EyeOff, RefreshCw, Save,
+  Mail, Share2, Eye, RefreshCw, Save,
   ChevronDown, ChevronRight, Award, Star
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -149,13 +149,9 @@ const ReportCard: React.FC<{
   onGenerate: () => void
   onDownload: () => void
 }> = ({ report, onGenerate, onDownload }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
   return (
     <motion.div
       whileHover={{ scale: 1.02, y: -5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
       className="glass-card p-6 relative overflow-hidden group"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${report.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
