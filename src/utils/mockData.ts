@@ -11,15 +11,13 @@ import type {
   Review,
   Discount,
   Campaign,
-  InventoryTransaction,
   Ticket,
   AnalyticsData,
   ProductStatus,
   OrderStatus,
   CustomerStatus,
   PaymentStatus,
-  FulfillmentStatus,
-  Tag
+  FulfillmentStatus
 } from '../types';
 
 // Initialize faker with seed for consistent data
@@ -157,19 +155,6 @@ export const REVIEW_CONTENTS = [
   'Shipping took a bit longer than expected but product is great.',
   'Best purchase I\'ve made this year. Highly recommended!'
 ];
-
-// ============================================================================
-// TAG GENERATOR (NEW)
-// ============================================================================
-
-export const generateTag = (name: string): Tag => {
-  return {
-    id: generateId('tag'),
-    name,
-    slug: faker.helpers.slugify(name).toLowerCase(),
-    count: randomInt(0, 100)
-  };
-};
 
 // ============================================================================
 // GENERATORS
@@ -432,7 +417,7 @@ export const generateBrand = (): Brand => {
 };
 
 // ============================================================================
-// PRODUCT GENERATOR (FIXED)
+// PRODUCT GENERATOR
 // ============================================================================
 
 export const generateProduct = (
@@ -452,6 +437,7 @@ export const generateProduct = (
   const price = randomFloat(19.99, 999.99);
   const cost = price * randomFloat(0.4, 0.7);
   const quantity = randomInt(0, 100);
+  const tagNames = Array.from({ length: randomInt(1, 5) }, () => faker.commerce.productAdjective());
   
   return {
     id,
@@ -467,7 +453,7 @@ export const generateProduct = (
     status: randomArrayItem<ProductStatus>(['active', 'active', 'active', 'draft', 'inactive']),
     visibility: randomArrayItem(['visible', 'visible', 'visible', 'hidden']),
     categories: [category.id],
-    tags: Array.from({ length: randomInt(1, 5) }, () => generateTag(faker.commerce.productAdjective())),
+    tags: tagNames,
     brand,
     images: Array.from({ length: randomInt(1, 5) }, (_, i) => ({
       id: generateId('img'),
@@ -558,6 +544,7 @@ export const generateCustomer = (storeId: string): Customer => {
   const createdAt = subMonths(new Date(), randomInt(1, 24));
   const totalOrders = randomInt(1, 20);
   const totalSpent = randomFloat(100, 5000);
+  const tagNames = randomArraySlice(['vip', 'repeat', 'new', 'at-risk', 'high-value'], 0, 3);
   
   return {
     id,
@@ -574,7 +561,7 @@ export const generateCustomer = (storeId: string): Customer => {
       generateAddress(i === 0 ? 'both' : 'shipping', 'US')
     ),
     groups: [],
-    tags: randomArraySlice(['vip', 'repeat', 'new', 'at-risk', 'high-value'], 0, 3).map(tagName => generateTag(tagName)),
+    tags: tagNames,
     notes: [],
     segments: [],
     metadata: {},
@@ -691,6 +678,7 @@ export const generateOrder = (
   
   const fulfillmentStatuses: FulfillmentStatus[] = ['unfulfilled', 'fulfilled', 'shipped', 'delivered'];
   const fulfillmentStatus = randomArrayItem(fulfillmentStatuses);
+  const tagNames = randomBoolean(0.2) ? ['gift', 'priority'] : [];
   
   const now = new Date();
   const createdAt = subDays(now, randomInt(1, 30));
@@ -743,7 +731,7 @@ export const generateOrder = (
       createdBy: 'system',
       createdAt: addDays(createdAt, randomInt(0, 2))
     }] : [],
-    tags: randomBoolean(0.2) ? ['gift', 'priority'].map(tagName => generateTag(tagName)) : [],
+    tags: tagNames,
     tracking: fulfillmentStatus === 'shipped' || fulfillmentStatus === 'delivered' ? [{
       id: generateId('track'),
       carrier: randomArrayItem(['UPS', 'FedEx', 'USPS']),
@@ -907,6 +895,7 @@ export const generateCampaign = (): Campaign => {
 export const generateTicket = (customerId: string): Ticket => {
   const id = generateId('ticket');
   const now = new Date();
+  const tagNames = randomArraySlice(['urgent', 'refund', 'return'], 0, 2);
   
   return {
     id,
@@ -924,7 +913,7 @@ export const generateTicket = (customerId: string): Ticket => {
         createdAt: subDays(now, randomInt(1, 3))
       }
     ],
-    tags: randomArraySlice(['urgent', 'refund', 'return'], 0, 2).map(tagName => generateTag(tagName)),
+    tags: tagNames,
     metadata: {},
     createdAt: subDays(now, randomInt(1, 7)),
     updatedAt: now
